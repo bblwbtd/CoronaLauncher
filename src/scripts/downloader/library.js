@@ -1,12 +1,13 @@
-const config = require('../Config')
+const config = require('../config')
 const path = require('path')
-const { validateFile, system, checkRules } = require('./common')
+const { validateFile, system, checkRules, patchDownload } = require('./common')
 
 const libraryPath = path.join(config.gameRoot, 'libraries')
 
 function validateDependence(dependence) {
     const filePath = path.join(libraryPath, ...dependence.path.split('/'))
-    return validateFile(filePath, dependence.sha1)
+    const result = validateFile(filePath, dependence.sha1)
+    return result
 }
 
 function validateArtifact(library) {
@@ -14,9 +15,9 @@ function validateArtifact(library) {
 }
 
 function validateClassifier(library, native) {
-    const classifier = library.classifiers[native]
-    const filePath = path.join(config.gameRoot, ...classifier.path.split('/'))
-    return validateDependence(filePath, classifier.sha1)
+    const classifier = library.downloads.classifiers[native]
+    if (!classifier) return true
+    return validateDependence(classifier)
 }
 
 function isVitalDependence(library) {
@@ -39,10 +40,10 @@ function validateAllDependencies(libraries) {
             if (!validateArtifact(library)) {
                 missingDependencies.push(downloads.artifact)
             }
-            if (downloads.classifier) {
-                const native = library.native[system]
-                if (validateClassifier(library, native)) {
-                    missingDependencies.push(downloads.classifier[native])
+            if (downloads.classifiers) {
+                const native = library.natives[system]
+                if (!validateClassifier(library, native)) {
+                    missingDependencies.push(downloads.classifiers[native])
                 }
             }
         }
@@ -50,14 +51,19 @@ function validateAllDependencies(libraries) {
     return missingDependencies.filter((item, index, array) => array.indexOf(item, 0) === index);
 }
 
+function downloadDependence(libraries) {
+    const tasks = []
+    for (const library of libraries) {
+        tasks.push({
+            URL: library.url,
+            filePath: path.join(libraryPath, ...library.path.split('/')),
+            sha1: library.sha1
+        })
+    }
+    return patchDownload(tasks)
+}
+
 module.exports = {
-    validateAllDependencies
+    validateAllDependencies,
+    downloadDependence
 }
-
-async function main() {
-    const library = require('./library.json')
-    console.log(await validateAllDependencies(library.libraries))
-
-}
-
-main()

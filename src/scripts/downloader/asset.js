@@ -1,5 +1,5 @@
 const {getAxios, validateFile, download} = require('./common')
-const config = require('../Config')
+const config = require('../config')
 const path = require('path')
 
 const axios = getAxios()
@@ -58,22 +58,3 @@ module.exports = {
     validateAssetIndex,
     validateAllAssert
 }
-
-async function main() {
-    const fs = require('fs');
-    const assetIndexInfo = {
-        "id": "1.16",
-        "sha1": "45aed441ccac08821cfc1121712e2a5b0df252e9",
-        "size": 295414,
-        "totalSize": 328850850,
-        "url": "https://launchermeta.mojang.com/v1/packages/45aed441ccac08821cfc1121712e2a5b0df252e9/1.16.json"
-    }
-    const indexPath = await downloadAssetIndex(assetIndexInfo)
-    const result = await validateAssetIndex(assetIndexInfo)
-    console.log(result)
-    const missing = await validateAllAssert(assetIndexInfo)
-    const downloaded = await Promise.allSettled(missing.map(element => downloadAsset(element)))
-    console.log(downloaded)
-}
-
-main()

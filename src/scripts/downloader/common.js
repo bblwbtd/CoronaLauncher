@@ -3,7 +3,7 @@ const fs = require('fs')
 const crypto = require('crypto')
 const path = require('path')
 const os = require('os')
-const config = require('../Config')
+const config = require('../config')
 
 const systemMap = {
     'darwin': 'osx',
@@ -33,38 +33,48 @@ function ensureDirExist(dirPath){
 async function patchDownload(tasks = []) {
     remainingTasks = tasks
     const success = []
-    const failed = []
+    let failed = []
 
-    const download = async (task) => {
+    const downloadItem = async (task) => {
         downloadingTasks.push(task)
         try{
-            await createDownloadTask(task.URL, task.filePath, task.requestConfig)
+            await download(
+                task.URL, 
+                task.filePath, 
+                task.sha1, 
+                task.requestConfig
+            )
             success.push(task)
         } catch (error) {
+            console.log(error)
             failed.push(task)
         }
         downloadingTasks = downloadingTasks.filter(item => item.URL != task.URL)
     }
 
-    return new Promise((resolve) => {
-        const times = Math.min(remainingTasks.length, config.maxParallelDownload)
-        for (let i = 0; i < times; i += 1){
+    const createDownloadTask = async () => {
+        while(remainingTasks.length > 0) {
             const task = remainingTasks.pop()
-            download(task)
-                .then(() => {
-                    if (remainingTasks.length > 0) {
-                        const task = remainingTasks.pop()
-                        download(task)
-                    }
-                    if (downloadingTasks.length === 0) {
-                        resolve([success, failed])
-                    }
-                })
+            await downloadItem(task)
         }
-    })
+    }
+
+    const downloadTasks = []
+    for (let i = 0; i < config.maxParallelDownload; i += 1) {
+        downloadTasks.push(createDownloadTask())
+    }
+    await Promise.allSettled(downloadTasks)
+
+    for (const failedTask of failed) {
+        if (validateFile(failedTask.filePath, failedTask.sha1)) {
+            failed = failed.filter(item => item.URL != failedTask.URL)
+        }
+    }
+
+    return [success, failed]
 }
 
-async function createDownloadTask(URL, filePath, requestConfig = {}) {
+async function download(URL, filePath, sha1, requestConfig = {}) {
     ensureDirExist(path.dirname(filePath))
     console.debug(`Begin download ${URL}`)
     const response = await axios.get(URL, {responseType: "stream", ...requestConfig})
@@ -72,8 +82,12 @@ async function createDownloadTask(URL, filePath, requestConfig = {}) {
     response.data.pipe(writer)
     return new Promise((resolve, reject) => {
         writer.on('finish', () => {
-            console.debug(`Download ${URL} successfully`)
-            resolve(filePath)
+            if (validateFile(filePath, sha1)) {
+                console.debug(`Download ${URL} successfully`)
+                resolve(filePath)
+            } else {
+                reject()
+            }
         })
         writer.on('error', (e) => {
             console.debug(`Fail to download ${URL}`)
