@@ -27,7 +27,7 @@ const defaultConfig = {
     },
     currentMirror: 'official',
     gameRoot: getGameRoot(),
-    parallelDownloadNumber: 10,
+    maxParallelDownload: 10,
 }
 
 let configFromFile = {}

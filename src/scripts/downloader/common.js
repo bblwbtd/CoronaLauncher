@@ -3,7 +3,7 @@ const fs = require('fs')
 const crypto = require('crypto')
 const path = require('path')
 const os = require('os')
-const { config } = require('process')
+const config = require('../Config')
 
 const systemMap = {
     'darwin': 'osx',
@@ -11,7 +11,8 @@ const systemMap = {
     'win32': 'windows'
 }
 const system = systemMap[os.platform()];
-let downloadingTask = 0
+let downloadingTasks = []
+let remainingTasks = []
 
 function validateFile(path, hash) {
     if(fs.existsSync(path)){
@@ -29,26 +30,55 @@ function ensureDirExist(dirPath){
     fs.mkdirSync(dirPath, {recursive: true})
 }
 
-async function download(URL, filePath, requestConfig = {}) {
-    
+async function patchDownload(tasks = []) {
+    remainingTasks = tasks
+    const success = []
+    const failed = []
+
+    const download = async (task) => {
+        downloadingTasks.push(task)
+        try{
+            await createDownloadTask(task.URL, task.filePath, task.requestConfig)
+            success.push(task)
+        } catch (error) {
+            failed.push(task)
+        }
+        downloadingTasks = downloadingTasks.filter(item => item.URL != task.URL)
+    }
+
+    return new Promise((resolve) => {
+        const times = Math.min(remainingTasks.length, config.maxParallelDownload)
+        for (let i = 0; i < times; i += 1){
+            const task = remainingTasks.pop()
+            download(task)
+                .then(() => {
+                    if (remainingTasks.length > 0) {
+                        const task = remainingTasks.pop()
+                        download(task)
+                    }
+                    if (downloadingTasks.length === 0) {
+                        resolve([success, failed])
+                    }
+                })
+        }
+    })
 }
 
 async function createDownloadTask(URL, filePath, requestConfig = {}) {
     ensureDirExist(path.dirname(filePath))
-    if (config.parallelDownloadNumber > downloadQueue.length) {
-        downloadQueue.push({
-            URL,
-            filePath,
-            requestConfig
-        })
-    }
-
+    console.debug(`Begin download ${URL}`)
     const response = await axios.get(URL, {responseType: "stream", ...requestConfig})
     const writer = fs.createWriteStream(filePath)
     response.data.pipe(writer)
     return new Promise((resolve, reject) => {
-        writer.on('finish', () => resolve(filePath))
-        writer.on('error', (e) => reject(e))
+        writer.on('finish', () => {
+            console.debug(`Download ${URL} successfully`)
+            resolve(filePath)
+        })
+        writer.on('error', (e) => {
+            console.debug(`Fail to download ${URL}`)
+            reject(e)
+        })
     })
 }
 
@@ -69,5 +99,8 @@ module.exports = {
     getAxios: () => axios,
     validateFile,
     checkRules,
+    patchDownload,
     system,
+    downloadingTasks,
+    remainingTasks,
 }
