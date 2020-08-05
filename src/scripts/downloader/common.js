@@ -117,4 +117,5 @@ module.exports = {
     system,
     downloadingTasks,
     remainingTasks,
+    download,
 }

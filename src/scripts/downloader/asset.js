@@ -1,37 +1,48 @@
-const {getAxios, validateFile, download} = require('./common')
+const { validateFile, patchDownload, download } = require('./common')
 const config = require('../config')
 const path = require('path')
-
-const axios = getAxios()
 
 const mirror = config.mirrors[config.currentMirror]
 
 async function downloadAssetIndex(assetIndexInfo, requestConfig = {}) {
     const filePath = getAssetIndexFilePath(assetIndexInfo)
-    return download(assetIndexInfo.url, filePath, requestConfig)
-}   
+    return download(
+        assetIndexInfo.url,
+        filePath,
+        assetIndexInfo.sha1,
+        requestConfig
+    )
+}
 
-async function validateAssetIndex(assetIndexInfo) {
+function validateAssetIndex(assetIndexInfo) {
     const filePath = getAssetIndexFilePath(assetIndexInfo)
     const hash = assetIndexInfo.sha1
     return validateFile(filePath, hash)
 }
 
-async function downloadAsset(assetObj, requestConfig = {}) {
-    const filePath = getAssetFilePath(assetObj)
-    const hash = assetObj.hash
-    const URL = `${mirror.asset}/${hash.substr(0,2)}/${hash}`
-    return download(URL, filePath, requestConfig)
+async function downloadAsset(assetObjects = []) {
+    const tasks = []
+    for (const assertInfo of assetObjects) {
+        const filePath = getAssetFilePath(assertInfo)
+        const sha1 = assertInfo.hash
+        const URL = `${mirror.asset}/${sha1.substr(0, 2)}/${sha1}`
+        tasks.push({
+            sha1,
+            URL,
+            filePath
+        })
+    }
+    return await patchDownload(tasks)
 }
 
-async function validateAssert(assetObj) {
+function validateAsset(assetObj) {
     const filePath = getAssetFilePath(assetObj)
     return validateFile(filePath, assetObj.hash)
 }
 
 function getAssetFilePath(assetObj) {
     const hash = assetObj.hash
-    const filePath = path.join(config.gameRoot, 'assets', 'objects', `${hash.substr(0,2)}/${hash}`)
+    const filePath = path.join(config.gameRoot, 'assets', 'objects', `${hash.substr(0, 2)}/${hash}`)
     return filePath
 }
 
@@ -39,13 +50,11 @@ function getAssetIndexFilePath(assetIndexInfo) {
     return path.join(config.gameRoot, 'assets', 'indexes', `${assetIndexInfo.id}.json`)
 }
 
-async function validateAllAssert(assetIndexInfo) {
-    const response = await axios.get(assetIndexInfo.url)
-    const assetIndex = response.data
-    const allObjects = assetIndex.objects
+function validateAllAsset(assetIndexInfo) {
+    const { objects } = require(getAssetIndexFilePath(assetIndexInfo))
     const missingFile = []
-    for (let value of Object.values(allObjects)) {
-        if (!await validateAssert(value)) {
+    for (let value of Object.values(objects)) {
+        if (!validateAsset(value)) {
             missingFile.push(value)
         }
     }
@@ -56,5 +65,5 @@ module.exports = {
     downloadAsset,
     downloadAssetIndex,
     validateAssetIndex,
-    validateAllAssert
+    validateAllAsset
 }
