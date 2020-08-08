@@ -17,6 +17,7 @@
     "@mdi/font": "^3.6.95",
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
+    "node-stream-zip": "^1.11.2",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",

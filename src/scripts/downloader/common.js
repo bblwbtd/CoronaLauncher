@@ -109,6 +109,7 @@ function checkRules(rules) {
 }
 
 
+
 module.exports = {
     getAxios: () => axios,
     validateFile,
@@ -118,4 +119,5 @@ module.exports = {
     downloadingTasks,
     remainingTasks,
     download,
+    ensureDirExist,
 }
