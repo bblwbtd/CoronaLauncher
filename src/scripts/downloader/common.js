@@ -3,7 +3,7 @@ const fs = require('fs')
 const crypto = require('crypto')
 const path = require('path')
 const os = require('os')
-const config = require('../config')
+const { getConfig } = require('../config')
 
 const systemMap = {
     'darwin': 'osx',
@@ -60,7 +60,7 @@ async function patchDownload(tasks = []) {
     }
 
     const downloadTasks = []
-    for (let i = 0; i < config.maxParallelDownload; i += 1) {
+    for (let i = 0; i < getConfig().maxParallelDownload; i += 1) {
         downloadTasks.push(createDownloadTask())
     }
     await Promise.allSettled(downloadTasks)

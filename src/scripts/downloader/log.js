@@ -1,20 +1,27 @@
-// const { download, validateFile } = require('./common')
-// const path = require('path')
-// const { gameRoot } = require('../config')
+const { download, validateFile } = require('./common')
+const path = require('path')
+const { getConfig } = require('../config')
 
-// const logConfigDirPath = path.join(gameRoot, 'assets', 'log_config')
+function getLogConfigPath(id) {
+    const { gameRoot } = getConfig()
+    const logConfigDirPath = path.join(gameRoot, 'assets', 'log_configs')
+    return path.join(logConfigDirPath, id)
+}
 
-// function getLogConfigPath(id) {
-//     return path.join(logConfigDirPath, id)
-// }
+function validateLogConfig(versionDetail){
+    const { file } = versionDetail.logging.client
+    return validateFile(getLogConfigPath(file.id), file.sha1)
+}
 
-// function validateLogConfig(logging){
-//     const { file } = logging.client
-//     return validateFile(getLogConfigPath(file.id), file.sha1)
-// }
+function downloadLogConfig(versionDetail, requestConfig) {
+    const { id, sha1, url } = versionDetail.logging.client.file
+    const { gameRoot } = getConfig()
+    const logConfigDirPath = path.join(gameRoot, 'assets', 'log_configs')
+    const filePath = path.join(logConfigDirPath, id)
+    return download(url, filePath, sha1, requestConfig)
+}
 
-// async function downloadLogConfig(logging) {
-//     const { id, sha1, url } = logging.client.file
-    
-//     return 
-// }
+module.exports = {
+    downloadLogConfig,
+    validateLogConfig
+}

@@ -38,7 +38,23 @@ if (fs.existsSync('config.json')) {
     fs.writeFileSync('config.json', JSON.stringify(defaultConfig))
 }
 
+function getConfig() {
+    return {
+        ...defaultConfig,
+        ...configFromFile,
+    }
+}
+
+function writeConfig(config) {
+    fs.writeFileSync(JSON.stringify(config))
+}
+
+function applyConfig(config) {
+    configFromFile = config
+}
+
 module.exports = {
-    ...defaultConfig,
-    ...configFromFile,
+    getConfig,
+    writeConfig,
+    applyConfig
 }
