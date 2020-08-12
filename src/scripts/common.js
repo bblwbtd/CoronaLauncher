@@ -3,7 +3,7 @@ const fs = require('fs')
 const crypto = require('crypto')
 const path = require('path')
 const os = require('os')
-const { getConfig } = require('../config')
+const { getConfig } = require('./config')
 
 const systemMap = {
     'darwin': 'osx',

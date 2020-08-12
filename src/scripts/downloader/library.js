@@ -5,7 +5,7 @@ const {
     checkRules, 
     patchDownload,
     ensureDirExist
-} = require('./common')
+} = require('../common')
 const { getConfig } = require('../config')
 const StreamZip = require('node-stream-zip')
 const fs = require('fs')
@@ -116,18 +116,23 @@ function extractNativeLibrary(zipFile, outDir) {
     })
 }
 
-async function extractAllNativesLibrary(versionDetail) {
+function getDefaultNativeDir() {
+    return path.join(getConfig().gameRoot, 'bin')
+}
+
+async function extractAllNativesLibrary(
+    versionDetail, 
+    outDir = getDefaultNativeDir()
+) {
     const { libraries } = versionDetail;
-    const { id } = versionDetail
-    const outPath = path.join(getConfig().gameRoot, 'versions', id, `${id}-natives`)
+    
     for (const library of libraries) {
         const { downloads } = library
         if (isVitalDependence(library) && downloads.classifiers) {
             const native = library.natives[system]
             const classifier = downloads.classifiers[native]
             const classifierPath = path.join(getLibrariesPath(), classifier.path)
-            await extractNativeLibrary(classifierPath, outPath)
-            console.log(classifierPath)
+            await extractNativeLibrary(classifierPath, outDir)
         }
     }
 }
@@ -135,5 +140,6 @@ async function extractAllNativesLibrary(versionDetail) {
 module.exports = {
     validateAllDependencies,
     downloadDependence,
-    extractAllNativesLibrary
+    extractAllNativesLibrary,
+    isVitalDependence,
 }

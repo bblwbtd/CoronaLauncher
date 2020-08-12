@@ -1,4 +1,4 @@
-const axios = require('./common').getAxios()
+const axios = require('../common').getAxios()
 const { getConfig } = require('../config')
 const path = require('path')
 const fs = require('fs')

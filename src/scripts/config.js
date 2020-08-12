@@ -1,5 +1,7 @@
 const fs = require('fs')
 const os = require('os')
+const path = require('path')
+const { escapeSpace } = require('./utils')
 
 function getGameRoot() {
     switch (os.platform()) {
@@ -28,6 +30,12 @@ const defaultConfig = {
     currentMirror: 'official',
     gameRoot: getGameRoot(),
     maxParallelDownload: 10,
+    nativePath: path.join(getGameRoot(), 'bin'),
+    usernames: [],
+    currentUsername: 'Steve',
+    width: 800,
+    height: 600,
+    maxMemory: '2G'
 }
 
 let configFromFile = {}
@@ -38,11 +46,17 @@ if (fs.existsSync('config.json')) {
     fs.writeFileSync('config.json', JSON.stringify(defaultConfig))
 }
 
-function getConfig() {
-    return {
+function getConfig(isEscapeSpace = false) {
+    const config = {
         ...defaultConfig,
         ...configFromFile,
     }
+
+    if (isEscapeSpace) {
+        config.gameRoot = escapeSpace(config.gameRoot)
+        config.nativePath = escapeSpace(config.nativePath) 
+    }
+    return config
 }
 
 function writeConfig(config) {

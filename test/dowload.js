@@ -1,4 +1,4 @@
-const {patchDownload} = require('../src/scripts/downloader/common')
+const {patchDownload} = require('../src/scripts/common')
 
 async function testPatchDownload() {
     const data = [

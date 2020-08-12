@@ -1,4 +1,4 @@
-const { download, validateFile } = require('./common')
+const { download, validateFile } = require('../common')
 const path = require('path')
 const { getConfig } = require('../config')
 
