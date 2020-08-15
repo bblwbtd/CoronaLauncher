@@ -2,6 +2,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const { escapeSpace } = require('./utils')
+const { v4 } = require('uuid')
 
 function getGameRoot() {
     switch (os.platform()) {
@@ -31,19 +32,40 @@ const defaultConfig = {
     gameRoot: getGameRoot(),
     maxParallelDownload: 10,
     nativePath: path.join(getGameRoot(), 'bin'),
-    usernames: [],
-    currentUsername: 'Steve',
+    accounts: [
+        {
+            id: '2333',
+            username: 'Steve',
+            accessToken: '123456',
+            password: '123456',
+            type: 'offline',
+            profile: {
+                name: 'Steve'
+            }
+        }
+    ],
+    currentAccount: {
+        id: '2333',
+        username: 'Steve',
+        accessToken: '123456',
+        password: '123456',
+        type: 'offline',
+        profile: {
+            name: 'Steve'
+        }
+    },
     width: 800,
     height: 600,
-    maxMemory: '2G'
+    maxMemory: '2G',
+    language: 'en',
+    closeLauncherOnStart: false,
+    clientToken: v4()
 }
 
 let configFromFile = {}
 
 if (fs.existsSync('config.json')) {
     configFromFile = JSON.parse(fs.readFileSync('config.json').toString())
-} else {
-    fs.writeFileSync('config.json', JSON.stringify(defaultConfig))
 }
 
 function getConfig(isEscapeSpace = false) {
@@ -60,15 +82,21 @@ function getConfig(isEscapeSpace = false) {
 }
 
 function writeConfig(config) {
-    fs.writeFileSync(JSON.stringify(config))
+    fs.writeFileSync('config.json' ,JSON.stringify(config))
 }
 
 function applyConfig(config) {
     configFromFile = config
 }
 
+function applyAndWriteConfig(config) {
+    applyConfig(config)
+    writeConfig(config)
+}
+
 module.exports = {
     getConfig,
     writeConfig,
-    applyConfig
+    applyConfig,
+    applyAndWriteConfig
 }

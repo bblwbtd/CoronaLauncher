@@ -5,9 +5,7 @@ const { getConfig } = require('./config')
 const os = require('os')
 const { exec } = require('child_process')
 
-async function launch(
-    versionDetail
-) {
+async function launch(versionDetail) {
     const config = getConfig()
     const command = buildCommand(
         versionDetail,

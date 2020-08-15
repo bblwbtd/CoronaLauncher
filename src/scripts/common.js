@@ -1,4 +1,4 @@
-const axios = require('axios').default
+const axios = require('axios')
 const fs = require('fs')
 const crypto = require('crypto')
 const path = require('path')
@@ -13,6 +13,10 @@ const systemMap = {
 const system = systemMap[os.platform()];
 let downloadingTasks = []
 let remainingTasks = []
+
+function getAxios() {
+    return axios.default
+}
 
 function validateFile(path, hash) {
     if(fs.existsSync(path)){
@@ -108,10 +112,8 @@ function checkRules(rules) {
     return result
 }
 
-
-
 module.exports = {
-    getAxios: () => axios,
+    getAxios,
     validateFile,
     checkRules,
     patchDownload,
