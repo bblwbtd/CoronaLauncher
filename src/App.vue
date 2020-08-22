@@ -23,6 +23,7 @@ export default {
   },
   mounted() {
     this.$i18n.locale = getConfig().language
+    this.$store.dispatch('refreshVersions')
   }
 }
 </script>

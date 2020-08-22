@@ -19,9 +19,7 @@
                     <v-list-item-subtitle>{{$store.state.config.currentAccount.type}}{{accountStatus ? `(${accountStatus})` : ''}}</v-list-item-subtitle>
                 </v-list-item-title>
                 <v-spacer />
-                <v-list-item-avatar>
-                    <CommonAvatar :name="$store.state.config.currentAccount.profile.name" />
-                </v-list-item-avatar>
+                <CommonAvatar size="32px" :name="$store.state.config.currentAccount.profile.name" />
             </v-list-item>
             <v-divider />
             <v-list-item key="1" @click="() => this.switch('/')">
@@ -30,11 +28,11 @@
                 </v-list-item-icon>
                 <v-list-item-title>{{$t('Home')}}</v-list-item-title>
             </v-list-item>
-            <v-list-item key="2" @click="() => this.switch('/installation')">
+            <v-list-item key="2" @click="() => this.switch('/versions')">
                 <v-list-item-icon>
-                    <v-icon>mdi-cloud</v-icon>
+                    <v-icon>mdi-minecraft</v-icon>
                 </v-list-item-icon>
-                <v-list-item-title>{{$t('Installation')}}</v-list-item-title>
+                <v-list-item-title>{{$t('Versions')}}</v-list-item-title>
             </v-list-item>
             <v-list-item key="3" @click="() => this.switch('/config')">
                 <v-list-item-icon>

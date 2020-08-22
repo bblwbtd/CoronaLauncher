@@ -1,4 +1,4 @@
-const { download, validateFile } = require('../common')
+const { download, validateFile, getMirror, replaceHost } = require('../common')
 const path = require('path')
 const { getConfig } = require('../config')
 
@@ -18,7 +18,8 @@ function downloadLogConfig(versionDetail, requestConfig) {
     const { gameRoot } = getConfig()
     const logConfigDirPath = path.join(gameRoot, 'assets', 'log_configs')
     const filePath = path.join(logConfigDirPath, id)
-    return download(url, filePath, sha1, requestConfig)
+    const mirror = getMirror()
+    return download(replaceHost(url, mirror.client), filePath, sha1, requestConfig)
 }
 
 module.exports = {

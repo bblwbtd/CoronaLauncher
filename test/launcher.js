@@ -1,6 +1,6 @@
 const { launch } = require('../src/scripts/launcher')
 const { extractAllNativesLibrary, validateAllDependencies, downloadDependence } = require('../src/scripts/downloader/library')
-const { validateAllAsset, downloadAsset } = require('../src/scripts/downloader/asset')
+const { validateAllAsset, downloadAsset } = require('../src/scripts/downloader/asset.js')
 const { fetchVersionManifest, findVersion, fetchVersionDetail } = require('../src/scripts/downloader/version')
 
 

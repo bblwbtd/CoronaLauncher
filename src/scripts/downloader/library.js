@@ -4,7 +4,9 @@ const {
     system, 
     checkRules, 
     patchDownload,
-    ensureDirExist
+    ensureDirExist,
+    getMirror,
+    replaceHost
 } = require('../common')
 const { getConfig } = require('../config')
 const StreamZip = require('node-stream-zip')
@@ -60,17 +62,24 @@ function validateAllDependencies(versionDetail) {
     return missingDependencies.filter((item, index, array) => array.indexOf(item, 0) === index);
 }
 
-function downloadDependence(libraries, requestConfig) {
+function transformLibraries2Tasks(libraries, requestConfig) {
     const tasks = []
+    const mirror = getMirror()
     for (const library of libraries) {
         tasks.push({
-            URL: library.url,
+            URL: replaceHost(library.url, mirror.libraries) ,
             filePath: path.join(getLibrariesPath(), ...library.path.split('/')),
             sha1: library.sha1,
+            size: library.size,
             requestConfig
         })
     }
-    return patchDownload(tasks)
+    return tasks
+}
+
+function downloadDependence(libraries, requestConfig, downloadConfig) {
+    const tasks = transformLibraries2Tasks(libraries, requestConfig)
+    return patchDownload(tasks, downloadConfig)
 }
 
 function extractNativeLibrary(zipFile, outDir) {
@@ -142,4 +151,5 @@ module.exports = {
     downloadDependence,
     extractAllNativesLibrary,
     isVitalDependence,
+    transformLibraries2Tasks
 }

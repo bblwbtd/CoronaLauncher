@@ -1,28 +1,28 @@
 <template>
-  <v-container fluid class="fill-height align-center justify-center">
-      <v-app-bar flat app>
-          <v-btn icon @click="() => $router.go(-1)">
-              <v-icon>
-                  mdi-arrow-left
-              </v-icon>
-          </v-btn>
-          <v-toolbar-title style="padding-left: 3px">
-            {{$t('Login')}}
-          </v-toolbar-title>
-      </v-app-bar>
-      <LoginForm />
-  </v-container>
+    <v-container fluid class="fill-height">
+        <v-app-bar flat app>
+            <BackButton />
+            <v-toolbar-title style="padding-left: 3px">{{$t('Login')}}</v-toolbar-title>
+        </v-app-bar>
+        <v-row justify="center">
+            <v-col cols="10" md="8" lg="6">
+                <LoginForm />
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
 import LoginForm from '../components/LoginForm'
+import BackButton from '../components/BackButton'
+
 export default {
     components: {
-        LoginForm
+        LoginForm,
+        BackButton
     }
 }
 </script>
 
 <style>
-
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <v-avatar v-on="$listeners" v-bind="$attrs">
+    <v-avatar tile v-on="$listeners" v-bind="$attrs">
         <v-img :src="src" @error="src = 'https://minotar.net/avatar/Steve'" />
     </v-avatar>
 </template>

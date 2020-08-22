@@ -8,11 +8,19 @@ async function testValidateAllDependencies() {
     console.log(missing)
 }
 
-async function testDownloadDependencies() {
+function testDownloadDependencies() {
     const missing = validateAllDependencies(versionDetail)
     console.log(missing)
-    const result = await downloadDependence(missing)
-    console.log(result[1])
+    const cancel = downloadDependence(missing, {},{
+        onProgress: (data) => {
+            const { downloadingTasks, remainingTasks, success, failed } = data
+            console.log(success.length / (downloadingTasks.length + remainingTasks.length + success.length + failed.length))
+        }
+    })
+    setTimeout(() => {
+        cancel()
+    }, 1000)
+
 }
 
 function testExtractAllNativesLibrary() {

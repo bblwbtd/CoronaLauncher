@@ -1,4 +1,4 @@
-const { download, validateFile } = require('../common')
+const { download, validateFile, getMirror, replaceHost } = require('../common')
 const path = require('path')
 const { getConfig } = require('../config')
 
@@ -11,7 +11,8 @@ function downloadClient(versionDetail, requestConfig) {
     const { id } = versionDetail
     const { client } = versionDetail.downloads
     const clientPath = getClientPath(id)
-    return download(client.url, clientPath, client.sha1, requestConfig)
+    const mirror = getMirror()
+    return download(replaceHost(client.url, mirror.client), clientPath, client.sha1, requestConfig)
 }
 
 function validateClient(versionDetail) {
@@ -21,7 +22,22 @@ function validateClient(versionDetail) {
     return validateFile(clientPath, client.sha1)
 }
 
+function getClientDownloadTask(versionDetail, requestConfig) {
+    const { id } = versionDetail
+    const { client } = versionDetail.downloads
+    const clientPath = getClientPath(id)
+    const mirror = getMirror()
+    return {
+        sha1: client.sha1,
+        URL: replaceHost(client.url,mirror.client),
+        filePath: clientPath,
+        size: client.size,
+        requestConfig
+    }
+}
+
 module.exports = {
     downloadClient,
-    validateClient
+    validateClient,
+    getClientDownloadTask
 }

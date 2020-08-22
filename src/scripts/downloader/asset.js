@@ -1,20 +1,16 @@
-const { validateFile, patchDownload, download } = require('../common')
+const { validateFile, patchDownload, download, getMirror, replaceHost } = require('../common')
 const path = require('path')
 const { getConfig } = require('../config')
+const fs = require('fs')
 
-function getMirror() {
-    const { mirrors, currentMirror } = getConfig()
-    return mirrors[currentMirror]
-}
-
-function downloadAssetIndex(versionDetail, requestConfig = {}) {
+function downloadAssetIndex(versionDetail) {
     const { assetIndex } = versionDetail
     const filePath = getAssetIndexFilePath(assetIndex)
+    const mirror = getMirror()
     return download(
-        assetIndex.url,
+        replaceHost(assetIndex.url, mirror.assetIndex),
         filePath,
         assetIndex.sha1,
-        requestConfig
     )
 }
 
@@ -25,21 +21,28 @@ function validateAssetIndex(versionDetail) {
     return validateFile(filePath, hash)
 }
 
-function downloadAsset(assetObjects = [], requestConfig) {
+function transformAssetObjects2Task(assetObjects = [], requestConfig) {
     const tasks = []
     const { asset } = getMirror()
-    for (const assertInfo of assetObjects) {
-        const filePath = getAssetFilePath(assertInfo)
-        const sha1 = assertInfo.hash
-        const URL = `${asset}/${sha1.substr(0, 2)}/${sha1}`
+    for (const assetInfo of assetObjects) {
+        const filePath = getAssetFilePath(assetInfo)
+        const sha1 = assetInfo.hash
+        const URL = `https://${asset}/${sha1.substr(0, 2)}/${sha1}`
+        const size = assetInfo.size
         tasks.push({
             sha1,
             URL,
             filePath,
+            size,
             requestConfig
         })
     }
-    return patchDownload(tasks)
+    return tasks
+}
+
+function downloadAsset(assetObjects = [], requestConfig, downloadConfig) {
+    const tasks = transformAssetObjects2Task(assetObjects, requestConfig)
+    return patchDownload(tasks, downloadConfig)
 }
 
 function validateAsset(assetObj) {
@@ -59,7 +62,8 @@ function getAssetIndexFilePath(assetIndexInfo) {
 
 function validateAllAsset(versionDetail) {
     const { assetIndex } = versionDetail
-    const { objects } = require(getAssetIndexFilePath(assetIndex))
+    const temp = fs.readFileSync(getAssetIndexFilePath(assetIndex)).toString()
+    const { objects } = JSON.parse(temp) ;
     const missingFile = []
     for (let value of Object.values(objects)) {
         if (!validateAsset(value)) {
@@ -73,5 +77,6 @@ module.exports = {
     downloadAsset,
     downloadAssetIndex,
     validateAssetIndex,
-    validateAllAsset
+    validateAllAsset,
+    transformAssetObjects2Task
 }

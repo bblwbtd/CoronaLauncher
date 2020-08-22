@@ -7,8 +7,8 @@ const {
     findVersion 
 } = require('../src/scripts/downloader/version')
 
-async function getManifest() {
-    return await fetchVersionManifest()
+function getManifest() {
+    return fetchVersionManifest()
 }
 
 it('testFetchVersionManifest', async () => {

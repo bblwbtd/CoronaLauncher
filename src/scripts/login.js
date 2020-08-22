@@ -1,36 +1,45 @@
-const axios = require('./common').getAxios()
 const { getConfig } = require('./config')
+const got = require('got')
 
 const baseURL = 'https://authserver.mojang.com'
 const config = getConfig()
 
 async function officialLogin(username, password) {
-    const response = await axios.post(`${baseURL}/authenticate`, {
-        "agent": {
-            "name": "Minecraft",
-            "version": 1
+    const { body } = await got.post(`${baseURL}/authenticate`, {
+        json: {
+            "agent": {
+                "name": "Minecraft",
+                "version": 1
+            },
+            username,
+            password,
+            clientToken: config.clientToken,
         },
-        username,
-        password,
-        clientToken: config.clientToken,
+        responseType: 'json'
     })
-    console.debug(response)
-    return response.data
+    console.debug(body)
+    return body
 }
 
 async function officialValidateToken(accessToken) {
-    await axios.post(`${baseURL}/validate`, {
-        accessToken,
-        clientToken: config.clientToken
+    await got.post(`${baseURL}/validate`, {
+        json: {
+            accessToken,
+            clientToken: config.clientToken
+        }
     })
 }
 
 async function officialRefresh(accessToken) {
-    const response = await axios.post(`${baseURL}/refresh`, {
-        accessToken,
-        clientToken: config.clientToken
+    const { body } = await got.post(`${baseURL}/refresh`, {
+        json: {
+            accessToken,
+            clientToken: config.clientToken
+        },
+        responseType: 'json'
     })
-    return response.data
+    console.debug(body)
+    return body
 }
 
 module.exports = {

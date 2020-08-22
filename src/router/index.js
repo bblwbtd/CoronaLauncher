@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import Installation from '../views/Installation.vue'
+import Versions from '../views/Versions.vue'
 import Config from '../views/Config.vue'
 import Login from '../views/Login'
+import VersionConfig from '../views/VersionConfig'
+import Download from '../views/Download'
 
 Vue.use(VueRouter)
   const routes = [
@@ -13,9 +15,9 @@ Vue.use(VueRouter)
     component: Home
   },
   {
-    path: '/installation',
-    name: 'Installation',
-    component: Installation,
+    path: '/versions',
+    name: 'Versions',
+    component: Versions,
   },
   {
     path: '/config',
@@ -26,6 +28,16 @@ Vue.use(VueRouter)
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/versions/config',
+    name: 'VersionConfig',
+    component: VersionConfig
+  },
+  {
+    path: '/download',
+    name: 'Download',
+    component: Download
   }
 ]
 

@@ -6,3 +6,9 @@
 ::-webkit-scrollbar {
     display: none;
 }
+
+.float-btn{
+    position: absolute !important ;
+    right: 30px;
+    bottom: 30px;
+}

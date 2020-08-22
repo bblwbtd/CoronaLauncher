@@ -1,9 +1,10 @@
-const axios = require('axios')
 const fs = require('fs')
 const crypto = require('crypto')
 const path = require('path')
 const os = require('os')
 const { getConfig } = require('./config')
+const got = require('got');
+const { pipeline } = require('stream')
 
 const systemMap = {
     'darwin': 'osx',
@@ -11,14 +12,9 @@ const systemMap = {
     'win32': 'windows'
 }
 const system = systemMap[os.platform()];
-let downloadingTasks = []
-let remainingTasks = []
-
-function getAxios() {
-    return axios.default
-}
 
 function validateFile(path, hash) {
+   
     if(fs.existsSync(path)){
         if(hash == null){
             return true
@@ -34,26 +30,71 @@ function ensureDirExist(dirPath){
     fs.mkdirSync(dirPath, {recursive: true})
 }
 
-async function patchDownload(tasks = []) {
-    remainingTasks = tasks
+function replaceHost(URL, host) {
+    const array = URL.split('/')
+    array[2] = host
+    return array.join('/')
+}
+
+function getMirror() {
+    const { mirrors, currentMirror } = getConfig()
+    return mirrors[currentMirror]
+}
+
+function patchDownload(tasks = [], downloadConfig = {}) {
+    for (const task of tasks) {
+        task.retries = 3
+        task.transferred = 0
+    }
+
+    const { onProgress } = downloadConfig
+    let downloadingTasks = []
+    let remainingTasks = tasks
+    const cancellation = {}
     const success = []
     let failed = []
 
+    const emitProgress = () => {
+        if (onProgress) {
+            onProgress({
+                downloadingTasks,
+                remainingTasks,
+                success,
+                failed
+            })
+        }
+    }
+
     const downloadItem = async (task) => {
         downloadingTasks.push(task)
+        emitProgress()
         try{
-            await download(
+            const [promise, cancel] = download(
                 task.URL, 
                 task.filePath, 
-                task.sha1, 
-                task.requestConfig
+                task.sha1,
+                (progress) => {
+                    task.transferred = progress.transferred
+                    emitProgress()
+                }
             )
+            cancellation[task.URL] = cancel
+            await promise
             success.push(task)
+            downloadingTasks = downloadingTasks.filter(item => item.URL != task.URL)
+            emitProgress()
         } catch (error) {
-            console.log(error)
-            failed.push(task)
+            console.error(error)
+
+            if (task.retries > 0) {
+                task.retries -= 1
+            } else {
+                failed.push(task)
+                downloadingTasks = downloadingTasks.filter(item => item.URL != task.URL)
+                emitProgress()
+            }
         }
-        downloadingTasks = downloadingTasks.filter(item => item.URL != task.URL)
+        delete cancellation[task.URL]
     }
 
     const createDownloadTask = async () => {
@@ -63,11 +104,9 @@ async function patchDownload(tasks = []) {
         }
     }
 
-    const downloadTasks = []
     for (let i = 0; i < getConfig().maxParallelDownload; i += 1) {
-        downloadTasks.push(createDownloadTask())
+        createDownloadTask()
     }
-    await Promise.allSettled(downloadTasks)
 
     for (const failedTask of failed) {
         if (validateFile(failedTask.filePath, failedTask.sha1)) {
@@ -75,29 +114,46 @@ async function patchDownload(tasks = []) {
         }
     }
 
-    return [success, failed]
+    const cancel = () => {
+        for (const cancelFun of Object.values(cancellation)) {
+            cancelFun()
+        }
+    }
+
+    return cancel
 }
 
-async function download(URL, filePath, sha1, requestConfig = {}) {
+function download(URL, filePath, sha1, onProgress = () => {}) {
     ensureDirExist(path.dirname(filePath))
     console.debug(`Begin download ${URL}`)
-    const response = await axios.get(URL, {responseType: "stream", ...requestConfig})
     const writer = fs.createWriteStream(filePath)
-    response.data.pipe(writer)
-    return new Promise((resolve, reject) => {
+    const stream = got.stream(URL).on('downloadProgress', onProgress)
+
+    return [new Promise((resolve, reject) => {
+        pipeline(
+            stream,
+            writer,
+            (err) => {
+                if (err) {
+                    console.debug(`Fail to download ${URL}`)
+                    reject(err)
+                }
+            }
+        )
         writer.on('finish', () => {
             if (validateFile(filePath, sha1)) {
                 console.debug(`Download ${URL} successfully`)
                 resolve(filePath)
             } else {
-                reject()
+                console.debug(`Fail to download ${URL}`)
+                reject(new Error('Fail to validate'))
             }
         })
         writer.on('error', (e) => {
             console.debug(`Fail to download ${URL}`)
             reject(e)
         })
-    })
+    }), stream.destroy]
 }
 
 function checkRules(rules) {
@@ -113,13 +169,12 @@ function checkRules(rules) {
 }
 
 module.exports = {
-    getAxios,
     validateFile,
     checkRules,
     patchDownload,
     system,
-    downloadingTasks,
-    remainingTasks,
     download,
     ensureDirExist,
+    getMirror,
+    replaceHost,
 }

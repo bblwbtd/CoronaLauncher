@@ -20,13 +20,19 @@ function getGameRoot() {
 const defaultConfig = {
     mirrors: {
         official: {
-            versionManifest: 'https://launchermeta.mojang.com/mc/game/version_manifest.json',
-            asset: 'http://resources.download.minecraft.net',
-            libraries: 'https://libraries.minecraft.net',
-            assetIndex: 'https://launchermeta.mojang.com',
-            versionList: 'https://launchermeta.mojang.com',
-            client: 'https://launcher.mojang.com'
+            versionManifest: 'launchermeta.mojang.com/mc/game/version_manifest.json',
+            asset: 'resources.download.minecraft.net',
+            libraries: 'libraries.minecraft.net',
+            assetIndex: 'launchermeta.mojang.com',
+            client: 'launcher.mojang.com'
         },
+        BMCLAPI: {
+            versionManifest: 'bmclapi2.bangbang93.com/mc/game/version_manifest.json',
+            asset: 'bmclapi2.bangbang93.com/assets',
+            assetIndex: 'bmclapi2.bangbang93.com',
+            libraries: 'bmclapi2.bangbang93.com/maven',
+            client: 'bmclapi2.bangbang93.com'
+        }
     },
     currentMirror: 'official',
     gameRoot: getGameRoot(),
@@ -59,7 +65,8 @@ const defaultConfig = {
     maxMemory: '2G',
     language: 'en',
     closeLauncherOnStart: false,
-    clientToken: v4()
+    clientToken: v4(),
+    versionConfig: {}
 }
 
 let configFromFile = {}

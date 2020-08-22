@@ -19,8 +19,8 @@ async function testValidateAndDownloadAsset() {
     }
     const missingAsset = validateAllAsset(versionDetail)
     console.log(missingAsset)
-    const [success, fail] = await downloadAsset(missingAsset)
-    console.log(success, fail)
+    const response = downloadAsset(missingAsset)
+    console.log(response)
 }
 
 testValidateAndDownloadAsset()
