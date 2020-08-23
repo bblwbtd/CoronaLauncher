@@ -53,17 +53,30 @@ export default {
         CommonDialog,
     },
     methods: {
-        getProgress(mission) {
+        aggregate(missions, field) {
+            return missions.reduce((preview, current) => preview + current[field], 0)
+        },
+        analyse(mission) {
             const { success, failed, downloadingTasks, remainingTasks } = mission
             console.log(mission)
-            const total = success.length + failed.length + downloadingTasks.length + remainingTasks.length
-            return `${this.$t('Total')}:${total} ${this.$t('Success')}:${success.length} ${this.$t('Fail')}:${failed.length}`
+            const totalTaskNumber = success.length + failed.length + downloadingTasks.length + remainingTasks.length
+            const tempArray = [success, failed, downloadingTasks, remainingTasks]
+            const totalSize = tempArray.reduce((preious, current) => preious + this.aggregate(current, 'size'), 0)
+            const transferredSize = tempArray.reduce((previous, current) => previous + this.aggregate(current, 'transferred'), 0)
+            return { totalTaskNumber, totalSize, transferredSize }
+        },
+        getProgress(mission) {
+            const { success, failed } = mission
+            const { totalTaskNumber, totalSize, transferredSize } = this.analyse(mission)
+            const bytes2MegaBytes = (bytes) => {
+                return (bytes / 1048576).toFixed(2)
+            }
+            return `${this.$t('Total')}:${totalTaskNumber} ${this.$t('Success')}:${success.length} ${this.$t('Fail')}:${failed.length} ${bytes2MegaBytes(transferredSize)}MB/${bytes2MegaBytes(totalSize)}MB`
         },
         getValue(mission) {
-            const { success, failed, downloadingTasks, remainingTasks } = mission
-            const total = success.length + failed.length + downloadingTasks.length + remainingTasks.length
-            if (!total) return 0
-            return ((success.length + failed.length) / total) * 100
+            const { transferredSize, totalSize } = this.analyse(mission)
+            if (!totalSize) return 0
+            return (transferredSize / totalSize) * 100
         },
         getState(mission) {
             switch (mission.state) {

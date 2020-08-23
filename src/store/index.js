@@ -32,11 +32,11 @@ export default new Vuex.Store({
       state.finishedMission.push(mission)
     },
     removeDownloadMission(state, missionID) {
-      const mission = state.downloadingMission.find(mission => mission.id === missionID)
-      if (mission && mission.cancel && (mission.state !== 'Success' || mission.state !== 'Fail')) {
-        mission.cancel()
-      }
       state.downloadingMission = state.downloadingMission.filter(mission => mission.id !== missionID)
+    },
+    cancelMission(state, missionID) {
+      const mission = state.downloadingMission.find(mission => mission.id === missionID)
+      mission.cancel()
     },
     updateDownloadMissionState(state, { missionID, missionState }) {
       for (let i = 0; i < state.downloadingMission.length; i += 1) {
