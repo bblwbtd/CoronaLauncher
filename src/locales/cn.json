@@ -11,7 +11,6 @@
   "BasicConfig": "基本设置",
   "Accounts": "用户",
   "About": "关于",
-  "Cancel": "取消",
   "Confirm": "确认",
   "DeleteConfirm": "删除确认",
   "DoYouReallyWantToDeleteThis": "你确定要删除这个吗？",
@@ -52,5 +51,7 @@
   "ValidatingLibrary": "正在校验依赖库",
   "ValidatingClient": "正在校验游戏核心",
   "Downloading": "下载中",
-  "Pending": "等待中"
+  "Pending": "等待中",
+  "Cancelled": "已取消",
+  "Cancel": "取消"
 }

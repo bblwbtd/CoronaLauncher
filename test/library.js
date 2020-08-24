@@ -13,8 +13,7 @@ function testDownloadDependencies() {
     console.log(missing)
     const cancel = downloadDependence(missing, {},{
         onProgress: (data) => {
-            const { downloadingTasks, remainingTasks, success, failed } = data
-            console.log(success.length / (downloadingTasks.length + remainingTasks.length + success.length + failed.length))
+            console.log(data)
         }
     })
     setTimeout(() => {

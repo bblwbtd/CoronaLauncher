@@ -4,6 +4,25 @@ const path = require('path')
 const { getConfig } = require('./config')
 const os = require('os')
 const { exec } = require('child_process')
+const {
+    validateAllAsset,
+    validateAssetIndex,
+    downloadAssetIndex,
+    transformAssetObjects2Task
+} = require('../scripts/downloader/asset.js') 
+const {
+    validateClient,
+    getClientDownloadTask
+} = require('../scripts/downloader/client') 
+const { 
+    validateLogConfig, 
+    getLogDownloadTask 
+} = require('../scripts/downloader/log') 
+const { 
+    validateAllDependencies, 
+    transformLibraries2Tasks 
+} = require( '../scripts/downloader/library')
+const { copyClient } = require('../scripts/client')
 
 async function launch(versionDetail) {
     const config = getConfig()
@@ -176,7 +195,37 @@ function getNativeDir() {
     return getConfig(true).nativePath
 }
 
+async function validateResources(versionDetail, name) {
+    if (!validateAssetIndex(versionDetail)) {
+        const [promise] = downloadAssetIndex(versionDetail)
+        await promise
+    }
+
+    const assetDownloadTasks = transformAssetObjects2Task(validateAllAsset(versionDetail))
+
+    const libraryDownloadTasks = transformLibraries2Tasks(validateAllDependencies(versionDetail))
+
+    const tasks = [...assetDownloadTasks, ...libraryDownloadTasks]
+
+    const hasClient = validateClient(versionDetail)
+
+    if (!hasClient) {
+        tasks.push(getClientDownloadTask(versionDetail))
+    } else if(hasClient && versionDetail.id !== name) {
+        copyClient(versionDetail.id, name)
+    }
+
+    const hasLogConfig = validateLogConfig(versionDetail)
+
+    if (!hasLogConfig) {
+        tasks.push(getLogDownloadTask(versionDetail))
+    }
+
+    return tasks
+}
+
 module.exports = {
     buildCommand,
     launch,
+    validateResources
 }

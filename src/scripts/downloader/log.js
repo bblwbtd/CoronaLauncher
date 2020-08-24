@@ -13,16 +13,31 @@ function validateLogConfig(versionDetail){
     return validateFile(getLogConfigPath(file.id), file.sha1)
 }
 
-function downloadLogConfig(versionDetail, requestConfig) {
+function downloadLogConfig(versionDetail) {
     const { id, sha1, url } = versionDetail.logging.client.file
     const { gameRoot } = getConfig()
     const logConfigDirPath = path.join(gameRoot, 'assets', 'log_configs')
     const filePath = path.join(logConfigDirPath, id)
     const mirror = getMirror()
-    return download(replaceHost(url, mirror.client), filePath, sha1, requestConfig)
+    return download(replaceHost(url, mirror.client), filePath, sha1)
+}
+
+function getLogDownloadTask(versionDetail) {
+    const { id, sha1, url, size } = versionDetail.logging.client.file
+    const { gameRoot } = getConfig()
+    const logConfigDirPath = path.join(gameRoot, 'assets', 'log_configs')
+    const filePath = path.join(logConfigDirPath, id)
+    const mirror = getMirror()
+    return {
+        sha1,
+        URL: replaceHost(url, mirror.client),
+        filePath,
+        size,
+    }
 }
 
 module.exports = {
     downloadLogConfig,
-    validateLogConfig
+    validateLogConfig,
+    getLogDownloadTask,
 }

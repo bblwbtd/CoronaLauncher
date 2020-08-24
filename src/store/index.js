@@ -11,8 +11,7 @@ export default new Vuex.Store({
     tab: 0,
     config: getConfig(),
     versions: [],
-    downloadingMission: [],
-    finishedMission: []
+    missions: [],
   },
   mutations: {
     setTab(state, tab) {
@@ -26,34 +25,27 @@ export default new Vuex.Store({
       state.versions = versions
     },
     addDownloadMission(state, mission) {
-      state.downloadingMission.push(mission)
-    },
-    addFinishedMission(state, mission) {
-      state.finishedMission.push(mission)
+      state.missions.push(mission)
     },
     removeDownloadMission(state, missionID) {
-      state.downloadingMission = state.downloadingMission.filter(mission => mission.id !== missionID)
-    },
-    cancelMission(state, missionID) {
-      const mission = state.downloadingMission.find(mission => mission.id === missionID)
-      mission.cancel()
+      state.missions = state.missions.filter(mission => mission.id !== missionID)
     },
     updateDownloadMissionState(state, { missionID, missionState }) {
-      for (let i = 0; i < state.downloadingMission.length; i += 1) {
-        const mission = state.downloadingMission[i];
+      for (let i = 0; i < state.missions.length; i += 1) {
+        const mission = state.missions[i];
         if (missionID === mission.id) {
           mission.state = missionState
-          state.downloadingMission = [...state.downloadingMission]
+          state.missions = [...state.missions]
           break
         }
       }
     },
     updateDownloadMission(state, mission) {
-      for (let index = 0; index < state.downloadingMission.length; index += 1) {
-        const target = state.downloadingMission[index];
+      for (let index = 0; index < state.missions.length; index += 1) {
+        const target = state.missions[index];
         if (target.id === mission.id) {
-          state.downloadingMission[index] = {...target, ...mission}
-          state.downloadingMission = [...state.downloadingMission]
+          state.missions[index] = {...target, ...mission}
+          state.missions = [...state.missions]
           return
         }
       }
@@ -63,11 +55,6 @@ export default new Vuex.Store({
     refreshVersions({ commit }) {
       readAllVersions().then(versions => commit('setVersions', versions.reverse()))
     },
-    finishMission({ commit }, mission) {
-      commit('removeDownloadMission', mission.id)
-      commit('addFinishedMission', mission)
-      console.log(mission)
-    }
   },
   modules: {
   }

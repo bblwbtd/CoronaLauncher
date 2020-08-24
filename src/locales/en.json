@@ -11,7 +11,6 @@
   "BasicConfig": "Basic config",
   "Accounts": "Accounts",
   "About": "About",
-  "Cancel": "Cancel",
   "Confirm": "Confirm",
   "DeleteConfirm": "Delete Confirm",
   "DoYouReallyWantToDeleteThis": "Do you really want to delete this?",
@@ -52,5 +51,7 @@
   "ValidatingLibrary": "Validating libraries",
   "ValidatingClient": "Validating client",
   "Downloading": "Downloading",
-  "Pending": "Pending"
+  "Pending": "Pending",
+  "Cancelled": "Cancelled",
+  "Cancel": "Cancel"
 }

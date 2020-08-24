@@ -49,7 +49,9 @@ export default {
     }
   },
   methods: {
-    
+    launchGame() {
+      
+    }
   }
 }
 </script>

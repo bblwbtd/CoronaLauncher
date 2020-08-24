@@ -45,28 +45,36 @@ function patchDownload(tasks = [], downloadConfig = {}) {
     for (const task of tasks) {
         task.retries = 3
         task.transferred = 0
+        task.state = 'Pending'
     }
 
     const { onProgress } = downloadConfig
-    let downloadingTasks = []
-    let remainingTasks = tasks
     const cancellation = {}
-    const success = []
-    let failed = []
+
+    const getPendingTasks = () => {
+        return tasks.filter(task => task.state === 'Pending')
+    }
 
     const emitProgress = () => {
         if (onProgress) {
             onProgress({
-                downloadingTasks,
-                remainingTasks,
-                success,
-                failed
+                tasks,
+                getSuccessfulTasks() {
+                    return tasks.filter(task => task.state === 'Success')
+                },
+                getFailedTasks() {
+                    return tasks.filter(task => task.state === 'Failed')
+                },
+                getDownloadingTasks() {
+                    return tasks.filter(task => task.state === 'Downloading')
+                },
+                getPendingTasks,
             })
         }
     }
 
     const downloadItem = async (task) => {
-        downloadingTasks.push(task)
+        task.state = 'Downloading'
         emitProgress()
         try{
             const [promise, cancel] = download(
@@ -75,52 +83,71 @@ function patchDownload(tasks = [], downloadConfig = {}) {
                 task.sha1,
                 (progress) => {
                     task.transferred = progress.transferred
+                    console.log(task)
                     emitProgress()
                 }
             )
             cancellation[task.URL] = cancel
             await promise
-            success.push(task)
-            downloadingTasks = downloadingTasks.filter(item => item.URL != task.URL)
-            emitProgress()
+            task.state = 'Success'
         } catch (error) {
-            console.error(error)
-
-            if (task.retries > 0) {
-                task.retries -= 1
-            } else {
-                failed.push(task)
-                downloadingTasks = downloadingTasks.filter(item => item.URL != task.URL)
-                emitProgress()
-            }
+            console.log(error)
+            if (task.state !== 'Cancelled') {
+                if (task.retries > 0) {
+                    task.retries -= 1
+                    task.state = 'Pending'
+                } else {
+                    task.state = 'Failed'
+                }
+            } 
         }
+        emitProgress()
         delete cancellation[task.URL]
     }
 
     const createDownloadTask = async () => {
-        while(remainingTasks.length > 0) {
-            const task = remainingTasks.pop()
+        while(getPendingTasks().length > 0) {
+            const task = getPendingTasks().pop()
             await downloadItem(task)
         }
     }
 
-    for (let i = 0; i < getConfig().maxParallelDownload; i += 1) {
-        createDownloadTask()
-    }
-
-    for (const failedTask of failed) {
-        if (validateFile(failedTask.filePath, failedTask.sha1)) {
-            failed = failed.filter(item => item.URL != failedTask.URL)
+    const startDownload = () => {
+        for (let i = 0; i < getConfig().maxParallelDownload; i += 1) {
+            createDownloadTask()
         }
     }
 
-    const cancel = () => {
+    const cancel = (deleteDownloaded = false) => {
+        tasks.forEach(task => task.state = 'Cancelled')
         for (const cancelFun of Object.values(cancellation)) {
             cancelFun()
         }
+        if (deleteDownloaded) {
+            tasks.forEach(task => {
+                if (fs.existsSync(task.filePath)) {
+                    fs.unlinkSync(task.filePath)
+                }
+            })
+        }
     }
 
-    return cancel
+    const retry = () => {
+        for (const task of tasks) {
+            if (!validateFile(task.filePath, task.sha1)){
+                task.state = 'Pending'
+            } else {
+                task.state = 'Success'
+            }
+        }
+        startDownload()
+    }
+
+    startDownload()
+    return {
+        cancel,
+        retry
+    }
 }
 
 function download(URL, filePath, sha1, onProgress = () => {}) {
@@ -153,7 +180,7 @@ function download(URL, filePath, sha1, onProgress = () => {}) {
             console.debug(`Fail to download ${URL}`)
             reject(e)
         })
-    }), stream.destroy]
+    }),() => stream.destroy()]
 }
 
 function checkRules(rules) {

@@ -41,20 +41,9 @@
 
 <script>
 import { fetchVersionManifest, fetchVersionDetail, writeVersionDetail } from '../scripts/downloader/version'
-import {
-  validateAllAsset,
-  validateAssetIndex,
-  downloadAssetIndex,
-  transformAssetObjects2Task
-} from '../scripts/downloader/asset.js'
-import {
-  validateClient,
-  getClientDownloadTask
-} from '../scripts/downloader/client'
 import { v4 } from 'uuid'
-import { validateAllDependencies, transformLibraries2Tasks } from '../scripts/downloader/library'
 import { patchDownload } from '../scripts/common'
-import { copyClient } from '../scripts/client'
+import { validateResources } from '../scripts/launcher'
 
 export default {
     props: {
@@ -142,10 +131,6 @@ export default {
                 id: v4(),
                 state: 'Pending',
                 name: formData.name,
-                success: [], 
-                failed: [], 
-                downloadingTasks: [], 
-                remainingTasks: [],
             }
             
             const updateState = (state) => {
@@ -155,65 +140,44 @@ export default {
                 })
             }
 
-            if (!validateAssetIndex(versionDetail)) {
-                const [promise] = downloadAssetIndex(versionDetail)
-                await promise
-            }
+            const tasks = await validateResources(versionDetail, this.formData.name)
 
-            const assetDownloadTasks = transformAssetObjects2Task(validateAllAsset(versionDetail))
-
-            const libraryDownloadTasks = transformLibraries2Tasks(validateAllDependencies(versionDetail))
-
-            const hasClient = validateClient(versionDetail)
-
-            const tasks = [...assetDownloadTasks, ...libraryDownloadTasks]
-            if (!hasClient) {
-                tasks.push(getClientDownloadTask(versionDetail))
-            } else if(hasClient && versionDetail.id !== formData.name) {
-                copyClient(versionDetail.id, formData.name)
-            }
-
-            // {
-            //   downloadingTasks,
-            //   remainingTasks,
-            //   success,
-            //   failed
-            // }
-            console.log(tasks)
             if (!tasks.length) {
                 store.dispatch('refreshVersions')
                 return
             }
-
+            
+            mission.tasks = tasks
             store.commit('addDownloadMission', mission)
 
             updateState('Downloading')
-            const cancelRequest = patchDownload(tasks, {
+            const { cancel: cancelRequest, retry: retryMission } = patchDownload(tasks, {
                 onProgress(progress) {
-                    console.log(progress)
-                    if (!progress.remainingTasks.length && !progress.downloadingTasks.length) {
-                        if (progress.failed.length) {
+                    const { tasks, getFailedTasks } = progress
+                    if (tasks.filter(task => task.state === 'Success' || task.state === 'Failed').length === tasks.length) {
+                        if (getFailedTasks().length) {
                             mission.state = 'Fail'
                         } else {
                             mission.state = 'Success'
                         }
-                        store.dispatch('finishMission', { ...mission, ...progress })
-                        if (versionDetail.id !== formData.name) {
-                            copyClient(versionDetail.id, formData.name)
-                        }
+                        updateState('Success')
                         store.dispatch('refreshVersions')
                         return
                     }
-                    store.commit('updateDownloadMission', { ...mission, ...progress })
+                    store.commit('updateDownloadMission', { id: mission.id, ...progress })
                 }
             })
 
             const cancel = () => {
-                updateState('Canceled')
+                updateState('Cancelled')
                 cancelRequest()
             }
+            const retry = () => {
+                updateState('Downloading')
+                retryMission()
+            }
 
-            store.commit('updateDownloadMission', {cancel, id: mission.id})
+            store.commit('updateDownloadMission', {cancel, retry,id: mission.id})
         }
     }
 }
