@@ -168,7 +168,7 @@ export default {
                 }
             })
 
-            const cancel = () => {
+            const cancel =   () => {
                 updateState('Cancelled')
                 cancelRequest()
             }

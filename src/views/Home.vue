@@ -20,7 +20,7 @@
                       <v-list-item>
                         {{$t('Latest')}}
                       </v-list-item>
-                      <v-list-item @click="() => {}" :key="version.name" v-for="version in $store.state.versions">
+                      <v-list-item @click="() => launchGame(version)" :key="version.name" v-for="version in $store.state.versions">
                         <v-list-item-content>
                           {{version.name}}
                         </v-list-item-content>
@@ -29,28 +29,37 @@
                 </v-menu>
             </div>
         </v-img>
+        
     </v-container>
 </template>
 
 <script>
 import DownloadButton from '../components/DownloadButton'
+import fs from 'fs'
+import { launch, validateResources } from '../scripts/launcher'
 
 export default {
   name: 'Home',
   components: {
-    DownloadButton
+    DownloadButton,
   },
   mounted() {
     
   },
   data(){
     return {
-      
+      visible: false
     }
   },
   methods: {
-    launchGame() {
-      
+    launchGame(version) {
+      const versionDetail = JSON.parse(fs.readFileSync(version.detailPath).toString())
+      const missingResources = validateResources(versionDetail, version.name)
+      if (missingResources.length === 0) {
+        launch(version)
+      } else {
+        this.visible = true
+      }
     }
   }
 }

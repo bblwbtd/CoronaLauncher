@@ -53,5 +53,6 @@
   "Downloading": "Downloading",
   "Pending": "Pending",
   "Cancelled": "Cancelled",
-  "Cancel": "Cancel"
+  "Cancel": "Cancel",
+  "MissingResources": "Missing resources"
 }
