@@ -1,10 +1,11 @@
+
 module.exports = {
   "transpileDependencies": [
     "vuetify"
   ],
   pluginOptions: {
     electronBuilder: {
-      nodeIntegration: true
+      nodeIntegration: true,
     },
     i18n: {
       locale: 'en',
@@ -12,5 +13,8 @@ module.exports = {
       localeDir: 'locales',
       enableInSFC: true
     }
+  },
+  configureWebpack: {
+    
   }
 }

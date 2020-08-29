@@ -1,8 +1,9 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import validateResources from './scripts/validateResources'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -26,6 +27,8 @@ function createWindow() {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      nodeIntegrationInWorker: true,
+      sandbox: false
     }
   })
 
@@ -92,3 +95,22 @@ if (isDevelopment) {
     })
   }
 }
+
+ipcMain.on('validate', async (event, args) => {
+  const { versionDetail, name } = args
+
+  try {
+    const missingResources = await validateResources(versionDetail, name)
+    event.reply('validate_reply', missingResources)
+  } catch (err) {
+    console.log(err)
+  }
+
+  // const worker = new Worker('./scripts/validateResources.js', { type: 'module' })
+
+  // worker.onmessage = (e) => {
+  //   event.reply(e.data)
+  // }
+
+  // worker.postMessage = ({versionDetail, name})
+})

@@ -41,8 +41,7 @@
 
 <script>
 import { fetchVersionManifest, fetchVersionDetail, writeVersionDetail } from '../scripts/downloader/version'
-import { v4 } from 'uuid'
-import { patchDownload } from '../scripts/common'
+import { scheduleDownloadTasks } from '../scripts/common'
 import { validateResources } from '../scripts/launcher'
 
 export default {
@@ -119,66 +118,11 @@ export default {
                 const versionMeta =  this.manifest.versions.find(version => version.id === this.formData.version)
                 const versionDetail = await fetchVersionDetail(versionMeta.url)
                 await writeVersionDetail(JSON.stringify(versionDetail))
-                await this.validateAndDownloadGame(versionDetail)
+                const tasks = await validateResources(versionDetail, this.formData.name)
+                await scheduleDownloadTasks(this.$store, this.formData.name, tasks)
                 this.loading = false
             }
         },
-        async validateAndDownloadGame(versionDetail) {
-            const store = this.$store
-            const formData = this.formData
-            
-            const mission = {
-                id: v4(),
-                state: 'Pending',
-                name: formData.name,
-            }
-            
-            const updateState = (state) => {
-                store.commit('updateDownloadMissionState', {
-                    missionID: mission.id,
-                    missionState: state
-                })
-            }
-
-            const tasks = await validateResources(versionDetail, this.formData.name)
-
-            if (!tasks.length) {
-                store.dispatch('refreshVersions')
-                return
-            }
-            
-            mission.tasks = tasks
-            store.commit('addDownloadMission', mission)
-
-            updateState('Downloading')
-            const { cancel: cancelRequest, retry: retryMission } = patchDownload(tasks, {
-                onProgress(progress) {
-                    const { tasks, getFailedTasks } = progress
-                    if (tasks.filter(task => task.state === 'Success' || task.state === 'Failed').length === tasks.length) {
-                        if (getFailedTasks().length) {
-                            mission.state = 'Fail'
-                        } else {
-                            mission.state = 'Success'
-                        }
-                        updateState('Success')
-                        store.dispatch('refreshVersions')
-                        return
-                    }
-                    store.commit('updateDownloadMission', { id: mission.id, ...progress })
-                }
-            })
-
-            const cancel =   () => {
-                updateState('Cancelled')
-                cancelRequest()
-            }
-            const retry = () => {
-                updateState('Downloading')
-                retryMission()
-            }
-
-            store.commit('updateDownloadMission', {cancel, retry,id: mission.id})
-        }
     }
 }
 </script>

@@ -17,9 +17,9 @@ function getLibrariesPath() {
     return path.join(gameRoot, 'libraries')
 }
 
-function validateDependence(dependence) {
+async function validateDependence(dependence) {
     const filePath = path.join(getLibrariesPath(), ...dependence.path.split('/'))
-    const result = validateFile(filePath, dependence.sha1)
+    const result = await validateFile(filePath, dependence.sha1)
     return result
 }
 
@@ -42,23 +42,26 @@ function isVitalDependence(library) {
     return checkRules(rules)
 }
 
-function validateAllDependencies(versionDetail) {
+async function validateAllDependencies(versionDetail) {
     const { libraries } = versionDetail
     const missingDependencies = []
-    libraries.forEach(library => {
+
+    for (let index = 0; index < libraries.length; index++) {
+        const library = libraries[index];
         const downloads = library.downloads
         if (isVitalDependence(library)) {
-            if (!validateArtifact(library)) {
+            if (!await validateArtifact(library)) {
                 missingDependencies.push(downloads.artifact)
             }
             if (downloads.classifiers) {
                 const native = library.natives[system]
-                if (!validateClassifier(library, native)) {
+                if (!await validateClassifier(library, native)) {
                     missingDependencies.push(downloads.classifiers[native])
                 }
             }
         }
-    });
+    }
+    
     return missingDependencies.filter((item, index, array) => array.indexOf(item, 0) === index);
 }
 

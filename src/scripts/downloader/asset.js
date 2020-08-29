@@ -60,13 +60,13 @@ function getAssetIndexFilePath(assetIndexInfo) {
     return path.join(getConfig().gameRoot, 'assets', 'indexes', `${assetIndexInfo.id}.json`)
 }
 
-function validateAllAsset(versionDetail) {
+async function validateAllAsset(versionDetail) {
     const { assetIndex } = versionDetail
     const temp = fs.readFileSync(getAssetIndexFilePath(assetIndex)).toString()
     const { objects } = JSON.parse(temp) ;
     const missingFile = []
     for (let value of Object.values(objects)) {
-        if (!validateAsset(value)) {
+        if (!await validateAsset(value)) {
             missingFile.push(value)
         }
     }

@@ -4,4 +4,6 @@ node_modules
 logs
 .vscode
 config.json
-dist_electron
+#Electron-builder output
+/dist_electron
+.yarnrc

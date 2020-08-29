@@ -1,10 +1,11 @@
 const fs = require('fs')
-const crypto = require('crypto')
 const path = require('path')
 const os = require('os')
 const { getConfig } = require('./config')
 const got = require('got');
 const { pipeline } = require('stream')
+const crypto = require('crypto')
+const { v4 } = require('uuid')
 
 const systemMap = {
     'darwin': 'osx',
@@ -13,14 +14,14 @@ const systemMap = {
 }
 const system = systemMap[os.platform()];
 
-function validateFile(path, hash) {
-   
+async function validateFile(path, hash) {
     if(fs.existsSync(path)){
         if(hash == null){
             return true
         }
         let buf = fs.readFileSync(path)
         let actualHash = crypto.createHash('sha1').update(buf).digest('hex')
+        // console.log(`${actualHash} ${hash}`)
         return actualHash === hash.toLowerCase()
     }
     return false
@@ -132,9 +133,9 @@ function patchDownload(tasks = [], downloadConfig = {}) {
         }
     }
 
-    const retry = () => {
+    const retry = async () => {
         for (const task of tasks) {
-            if (!validateFile(task.filePath, task.sha1)){
+            if (!await validateFile(task.filePath, task.sha1)){
                 task.state = 'Pending'
             } else {
                 task.state = 'Success'
@@ -167,8 +168,8 @@ function download(URL, filePath, sha1, onProgress = () => {}) {
                 }
             }
         )
-        writer.on('finish', () => {
-            if (validateFile(filePath, sha1)) {
+        writer.on('finish',async () => {
+            if (await validateFile(filePath, sha1)) {
                 console.debug(`Download ${URL} successfully`)
                 resolve(filePath)
             } else {
@@ -195,6 +196,68 @@ function checkRules(rules) {
     return result
 }
 
+async function scheduleDownloadTasks(
+    store,
+    name,
+    tasks,
+    callback,
+) {
+    const mission = {
+        id: v4(),
+        state: 'Pending',
+        name: name,
+    }
+    
+    const updateState = (state) => {
+        store.commit('updateDownloadMissionState', {
+            missionID: mission.id,
+            missionState: state
+        })
+    }
+
+    if (!tasks.length) {
+        store.dispatch('refreshVersions')
+        return
+    }
+    
+    mission.tasks = tasks
+    store.commit('addDownloadMission', mission)
+
+    updateState('Downloading')
+    const { cancel: cancelRequest, retry: retryMission } = patchDownload(tasks, {
+        onProgress(progress) {
+            const { tasks, getFailedTasks } = progress
+            if (tasks.filter(task => task.state === 'Success' || task.state === 'Failed').length === tasks.length) {
+                if (getFailedTasks().length) {
+                    mission.state = 'Fail'
+                    updateState('Fail')
+                } else {
+                    mission.state = 'Success'
+                    updateState('Success')
+                }
+                if (callback) {
+                    callback(mission.state)
+                }
+                store.dispatch('refreshVersions')
+                return
+            }
+            store.commit('updateDownloadMission', { id: mission.id, ...progress })
+        }
+    })
+
+    const cancel = () => {
+        updateState('Cancelled')
+        cancelRequest()
+    }
+    const retry = () => {
+        updateState('Downloading')
+        retryMission()
+    }
+
+    store.commit('updateDownloadMission', {cancel, retry,id: mission.id})
+    return mission.id
+}
+
 module.exports = {
     validateFile,
     checkRules,
@@ -204,4 +267,5 @@ module.exports = {
     ensureDirExist,
     getMirror,
     replaceHost,
+    scheduleDownloadTasks
 }
