@@ -8,13 +8,24 @@
         >
             <template v-slot:prepend-item>
                 <v-list-item>
-                    <v-checkbox v-model="showRelease" class="mr-3" :label="$t('Release')" />
-                    <v-checkbox v-model="showSnapShot" class="mr-3" :label="$t('Snapshot')" />
-                    <v-text-field v-model="search" :placeholder="$t('Search')" />
+                    <v-checkbox
+                        v-model="showRelease"
+                        class="mr-3"
+                        :label="$t('Release')"
+                    />
+                    <v-checkbox
+                        v-model="showSnapShot"
+                        class="mr-3"
+                        :label="$t('Snapshot')"
+                    />
+                    <v-text-field
+                        v-model="search"
+                        :placeholder="$t('Search')"
+                    />
                 </v-list-item>
             </template>
             <template v-slot:no-data>
-                <v-list-item>{{$t('NoData')}}</v-list-item>
+                <v-list-item>{{ $t("NoData") }}</v-list-item>
             </template>
         </v-select>
         <v-text-field
@@ -35,14 +46,20 @@
                 :label="$t('StartGameWhenDownloadFinish')"
             />
         </div>
-        <v-btn color="green" :loading="loading" @click="handleSave">{{$t('Save')}}</v-btn>
+        <v-btn color="green" :loading="loading" @click="handleSave">{{
+            $t("Save")
+        }}</v-btn>
     </v-form>
 </template>
 
 <script>
-import { fetchVersionManifest, fetchVersionDetail, writeVersionDetail } from '../scripts/downloader/version'
-import { scheduleDownloadTasks } from '../scripts/common'
-import { validateResources } from '../scripts/launcher'
+import {
+    fetchVersionManifest,
+    fetchVersionDetail,
+    writeVersionDetail
+} from "../scripts/downloader/version";
+import { scheduleDownloadTasks } from "../scripts/common";
+import { validateResources } from "../scripts/launcher";
 
 export default {
     props: {
@@ -57,18 +74,18 @@ export default {
         }
     },
     async mounted() {
-        this.manifest = await fetchVersionManifest()
-        this.fetchVersions()
+        this.manifest = await fetchVersionManifest();
+        this.fetchVersions();
     },
     watch: {
         showRelease: function() {
-            this.fetchVersions()
+            this.fetchVersions();
         },
         showSnapShot: function() {
-            this.fetchVersions()
+            this.fetchVersions();
         },
         search: function() {
-            this.fetchVersions()
+            this.fetchVersions();
         }
     },
     data: () => ({
@@ -76,56 +93,75 @@ export default {
         manifest: {},
         showRelease: true,
         showSnapShot: false,
-        search: '',
-        loading: false,
+        search: "",
+        loading: false
     }),
     methods: {
         async fetchVersions() {
             try {
-                const results = []
+                const results = [];
                 this.manifest.versions.forEach(version => {
-                    const { type, id } = version
-                    if ((type === 'snapshot' && this.showSnapShot) || (type === 'release' && this.showRelease)) {
+                    const { type, id } = version;
+                    if (
+                        (type === "snapshot" && this.showSnapShot) ||
+                        (type === "release" && this.showRelease)
+                    ) {
                         results.push({
                             text: `${type} ${id}`,
                             value: id
-                        })
+                        });
                     }
-                })
-                this.versions = results.filter(data => data.text.includes(this.search))
-            } catch(e) {
-                this.$emit('error', e)
+                });
+                this.versions = results.filter(data =>
+                    data.text.includes(this.search)
+                );
+            } catch (e) {
+                this.$emit("error", e);
             }
         },
         versionNameRule() {
             return [
-                (value) => {
-                    if (!value) return this.$t('CanNotBeEmpty')
-                    return true
+                value => {
+                    if (!value) return this.$t("CanNotBeEmpty");
+                    return true;
                 },
-                (value) => {
-                    if (this.$store.state.versions.find(version => version.name === value)) return this.$t('NameExisted')
-                    return true
+                value => {
+                    if (
+                        this.$store.state.versions.find(
+                            version => version.name === value
+                        )
+                    )
+                        return this.$t("NameExisted");
+                    return true;
                 }
-            ]
+            ];
         },
         fillVersionName() {
-            this.formData.name = this.formData.version
+            this.formData.name = this.formData.version;
         },
         async handleSave() {
             if (this.formData.downloadImmediately) {
-                this.loading = true
-                const versionMeta =  this.manifest.versions.find(version => version.id === this.formData.version)
-                const versionDetail = await fetchVersionDetail(versionMeta.url)
-                await writeVersionDetail(JSON.stringify(versionDetail))
-                const tasks = await validateResources(versionDetail, this.formData.name)
-                await scheduleDownloadTasks(this.$store, this.formData.name, tasks)
-                this.loading = false
+                this.loading = true;
+                const versionMeta = this.manifest.versions.find(
+                    version => version.id === this.formData.version
+                );
+                const versionDetail = await fetchVersionDetail(versionMeta.url);
+                await writeVersionDetail(JSON.stringify(versionDetail));
+                const tasks = await validateResources(
+                    versionDetail,
+                    this.formData.name
+                );
+
+                await scheduleDownloadTasks({
+                    store: this.$store,
+                    name: this.formData.name,
+                    tasks
+                });
+                this.loading = false;
             }
-        },
+        }
     }
-}
+};
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

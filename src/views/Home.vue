@@ -29,31 +29,21 @@
                 </v-menu>
             </div>
         </v-img>
-        <CommonDialog
-          :title="$t('MissingResources')"
-          :content="$t('DownloadNotification')"
-          v-model="visible"
-        >
-          <v-btn
-            text
-            color="green"
-          >{{$t('Confirm')}}</v-btn>
-        </CommonDialog>
+        <LaunchDialog ref="launchDialog">
+
+        </LaunchDialog>
     </v-container>
 </template>
 
 <script>
 import DownloadButton from '../components/DownloadButton'
-import fs from 'fs'
-import { validateResources } from '../scripts/launcher'
-import CommonDialog from '../components/CommonDialog'
-// import { scheduleDownloadTasks } from '../scripts/common'
+import LaunchDialog from '../components/LaunchDialog'
 
 export default {
   name: 'Home',
   components: {
     DownloadButton,
-    CommonDialog
+    LaunchDialog
   },
   mounted() {
     
@@ -64,21 +54,8 @@ export default {
     }
   },
   methods: {
-    async launchGame(version) {
-      this.visible = true;
-      this.state = this.$t("ValidatingResources");
-      const versionDetail = JSON.parse(
-        fs.readFileSync(version.detailFilePath).toString()
-      );
-      const tasks = await validateResources(versionDetail, version.name)
-      console.log(tasks)
-      if (tasks.length) {
-        // scheduleDownloadTasks(this.$store, version, tasks, (result) => {
-
-        // })
-        this.visible = true
-        return
-      }
+    launchGame(version) {
+      this.$refs.launchDialog.launch(version)
     }
   }
 }

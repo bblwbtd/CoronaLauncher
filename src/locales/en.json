@@ -57,5 +57,8 @@
   "MissingResources": "Missing resources",
   "launching": "Launching",
   "ValidatingResources": "ValidatingResources",
-  "DownloadNotification": "The game will start once download is finished. You can look up the progress in download center of upper right corner."
+  "DownloadNotification": "The game will start once download is finished. You can look up the progress in download center of upper right corner.",
+  "DownloadAndStart": "Download and start",
+  "Dismiss": "Dismiss",
+  "Launching": "Launching"
 }

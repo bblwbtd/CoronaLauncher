@@ -45,6 +45,7 @@
 
 <script>
 import CommonDialog from '../components/CommonDialog'
+
 export default {
     data: () => ({
         visible: false,
@@ -55,9 +56,6 @@ export default {
         CommonDialog,
     },
     methods: {
-        aggregate(tasks, field) {
-            return tasks.reduce((preview, current) => preview + current[field], 0)
-        },
         analyse(mission) {
             const { tasks } = mission
             const totalTaskNumber = tasks.length

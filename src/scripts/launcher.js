@@ -6,63 +6,40 @@ const os = require("os");
 const { exec } = require("child_process");
 const { ipcRenderer } = require("electron");
 
-// const {
-//     validateAllAsset,
-//     validateAssetIndex,
-//     downloadAssetIndex,
-//     transformAssetObjects2Task
-// } = require("../scripts/downloader/asset.js");
-// const {
-//     validateClient,
-//     getClientDownloadTask
-// } = require("../scripts/downloader/client");
-// const {
-//     validateLogConfig,
-//     getLogDownloadTask
-// } = require("../scripts/downloader/log");
-// const {
-//     validateAllDependencies,
-//     transformLibraries2Tasks
-// } = require("../scripts/downloader/library");
-// const { copyClient } = require("../scripts/client");
+function launch(versionDetail) {
+    return new Promise((resolve, reject) => {
+        const config = getConfig();
+        const command = buildCommand(
+            versionDetail,
+            config.currentUsername,
+            "123123",
+            "123132",
+            "Mojang",
+            config.width,
+            config.height,
+            config.maxMemory,
+            "CoronaLauncher",
+            "0.0.1",
+            ""
+        );
 
-async function launch(versionDetail) {
-    const config = getConfig();
-    const command = buildCommand(
-        versionDetail,
-        config.currentUsername,
-        "123123",
-        "123132",
-        "Mojang",
-        config.width,
-        config.height,
-        config.maxMemory,
-        "CoronaLauncher",
-        "0.0.1",
-        ""
-    );
+        console.log(command);
+        const childProcess = exec(command);
 
-    console.log(command);
-    const childProcess = exec(command);
+        childProcess.stdout.once('data', () => resolve())
+        childProcess.on('exit', (code) => {
+            if (code) {
+                reject(new Error(`${code}`))
+            }
+        })
 
-    childProcess.stdout.on("data", message => {
-        console.log(message);
-    });
+        childProcess.stdout.on("data", message => {
+            console.log("info:" + message);
+        });
 
-    childProcess.stdout.on("error", err => {
-        console.log(err.message.trim());
-    });
-
-    childProcess.stderr.on("data", message => {
-        console.log(message);
-    });
-
-    childProcess.on("error", err => {
-        console.log(err);
-    });
-
-    childProcess.on("close", (code, signal) => {
-        console.log(code, signal);
+        childProcess.stderr.on("data", message => {
+            console.log("error:" + message);
+        });
     });
 }
 
@@ -206,19 +183,18 @@ function getNativeDir() {
 }
 
 function validateResources(versionDetail, name) {
-    return new Promise((resolve) => {
-        ipcRenderer.send('validate', {versionDetail, name})
-        ipcRenderer.once('validate_reply', (_event, args) => {
-            const missingResources = args
-            console.log(missingResources)
-            resolve(missingResources)
-        })
-    })
+    return new Promise(resolve => {
+        ipcRenderer.send("validate", { versionDetail, name });
+        ipcRenderer.once("validate_reply", (_event, args) => {
+            const missingResources = args;
+            console.log(missingResources);
+            resolve(missingResources);
+        });
+    });
 }
-
 
 module.exports = {
     buildCommand,
     launch,
-    validateResources,
+    validateResources
 };

@@ -1,6 +1,4 @@
-/**
- * @jest-environment node
- */
+
 const { 
     fetchVersionDetail, 
     fetchVersionManifest, 

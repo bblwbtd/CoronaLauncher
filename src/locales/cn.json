@@ -55,7 +55,9 @@
   "Cancelled": "已取消",
   "Cancel": "取消",
   "MissingResources": "缺少资源",
-  "launching": "启动中",
+  "Launching": "启动中",
   "ValidatingResources": "正在校验资源",
-  "DownloadNotification": "游戏将在下载成功后启动,你可以在右上角的下载中心查看下载进度"
+  "DownloadNotification": "游戏将在下载成功后启动,你可以在右上角的下载中心查看下载进度",
+  "DownloadAndStart": "下载并启动",
+  "Dismiss": "隐藏"
 }
