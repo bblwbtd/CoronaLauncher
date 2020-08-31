@@ -24,6 +24,8 @@ async function validateDependence(dependence) {
 }
 
 function validateArtifact(library) {
+    console.log(library)
+    if (!library.downloads.artifact) return true
     return validateDependence(library.downloads.artifact)
 }
 
@@ -87,12 +89,12 @@ function downloadDependence(libraries, requestConfig, downloadConfig) {
 
 function extractNativeLibrary(zipFile, outDir) {
     const libraryExtensionMap = {
-        'osx': '.dylib',
+        'osx': '.dylib|.jnilib',
         'linux': '.so',
         'windows': '.dll'
     }
     const extension = libraryExtensionMap[system]
-    const re = new RegExp(`[\\S]*${extension}`)
+    const re = new RegExp(extension)
     return new Promise((resolve, reject) => {
         const zip = new StreamZip({
             file: zipFile,
@@ -103,6 +105,7 @@ function extractNativeLibrary(zipFile, outDir) {
         
         zip.on('ready', () => {
             const target = Object.keys(zip.entries()).find(v => re.test(v))
+            console.log(zip.entries())
             if (target) {
                 const outPath = path.join(outDir, target)
                 ensureDirExist(outDir)

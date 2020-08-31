@@ -5,6 +5,7 @@ const { getConfig, applyAndWriteConfig } = require("./config");
 const os = require("os");
 const { exec } = require("child_process");
 const { ipcRenderer } = require("electron");
+const fs = require('fs')
 
 function launch(versionDetail) {
     return new Promise((resolve, reject) => {
@@ -39,6 +40,7 @@ function launch(versionDetail) {
                 if (code) {
                     reject(new Error(`${code}`))
                 }
+                fs.rmdirSync(getNativeDir(), { recursive: true })
             })
     
             childProcess.stdout.on("data", message => {
@@ -123,7 +125,7 @@ function buildOldVersionCommand(versionDetail) {
     const gameArgs = versionDetail.minecraftArguments
     const javaPath = getJavaPath();
     const logArgs = buildLogConfigPath(versionDetail)
-    return `${javaPath} ${"-cp ${classpath}"} ${logArgs} ${mainClass} ${gameArgs}`
+    return `${javaPath} ${"-cp ${classpath}"} ${'"-Djava.library.path=${natives_directory}"'} ${'-Xmx${max_memory}'} ${logArgs} ${mainClass} ${gameArgs}`
 }
 
 function buildLogConfigPath(versionDetail) {
@@ -181,7 +183,7 @@ function buildClassPath(versionDetail) {
     const { libraries, id } = versionDetail;
     const librariesPaths = [];
     for (const library of libraries) {
-        if (isVitalDependence(library)) {
+        if (isVitalDependence(library) && library.downloads.artifact) {
             const libraryPath = path.join(
                 getConfig(true).gameRoot,
                 "libraries",
