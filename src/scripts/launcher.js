@@ -11,10 +11,15 @@ function launch(versionDetail) {
         const config = getConfig();
         config.lastLaunch = versionDetail.id
         applyAndWriteConfig(config)
+
+        let playerName = 'Steve'
+        if (config.currentAccount) {
+            playerName = config.currentAccount.username
+        }
         extractAllNativesLibrary(versionDetail).then(() => {
             const command = buildCommand(
                 versionDetail,
-                config.currentAccount.username,
+                playerName,
                 "123123",
                 "123132",
                 "Mojang",
@@ -169,7 +174,6 @@ function buildJVMArgs(jvm) {
         }
         return arg
     })
-    console.log(argumentList)
     return argumentList.join(" ");
 }
 

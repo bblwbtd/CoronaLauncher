@@ -67,7 +67,9 @@ export default {
     },
     mounted() {
         this.config = this.$store.state.config
-        this.selected = this.config.currentAccount.id
+        if (this.config.currentAccount) {
+            this.selected = this.config.currentAccount.id
+        }
     },
     watch: {
         selected: function(newSelected) {
@@ -95,8 +97,9 @@ export default {
         delete_account() {
             this.config.accounts = this.config.accounts.filter(account => account.id !== this.deleteTarget.id)
             if (this.config.currentAccount.id === this.deleteTarget.id) {
-                this.config.currentAccount = this.config.accounts[0]
+                this.config.currentAccount = this.config.accounts[0] || null
             }
+            console.log(this.config)
             this.$store.commit('setConfig', this.config)
             this.visible = false
         }

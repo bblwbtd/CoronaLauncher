@@ -28,7 +28,7 @@ function createWindow() {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-    }
+    },
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -45,8 +45,14 @@ function createWindow() {
     win = null
   })
 
-
+  win.webContents.once('did-finish-load', () => {
+    win.setMenuBarVisibility(false);
+  })
 }
+
+app.on('browser-window-created',function(e,window) {
+  window.setMenuBarVisibility(false);
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
