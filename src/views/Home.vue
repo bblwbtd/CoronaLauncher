@@ -20,6 +20,7 @@
                             v-on="on"
                             v-bind="attrs"
                             @click="launchLast"
+                            :disabled="!$store.state.versions.length"
                         >
                             <div id="op_content">
                                 <div>{{ $t("Play") }}</div>
