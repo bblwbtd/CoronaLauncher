@@ -3,7 +3,6 @@
 node_modules
 logs
 .vscode
-config.json
 #Electron-builder output
 /dist_electron
 .yarnrc
