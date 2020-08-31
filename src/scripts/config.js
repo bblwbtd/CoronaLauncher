@@ -1,7 +1,7 @@
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
-const { escapeSpace } = require('./utils')
+// const { escapeSpace } = require('./utils')
 const { v4 } = require('uuid')
 
 function getGameRoot() {
@@ -76,16 +76,16 @@ if (fs.existsSync('config.json')) {
     configFromFile = JSON.parse(fs.readFileSync('config.json').toString())
 }
 
-function getConfig(isEscapeSpace = false) {
+function getConfig() {
     const config = {
         ...defaultConfig,
         ...configFromFile,
     }
 
-    if (isEscapeSpace) {
-        config.gameRoot = escapeSpace(config.gameRoot)
-        config.nativePath = escapeSpace(config.nativePath) 
-    }
+    // if (isEscapeSpace) {
+    //     config.gameRoot = escapeSpace(config.gameRoot)
+    //     config.nativePath = escapeSpace(config.nativePath) 
+    // }
     return config
 }
 

@@ -64,20 +64,22 @@ function buildCommand(
     let command = "";
     if (versionDetail.arguments) {
         command = buildNewVersionCommand(versionDetail);
+    } else {
+        command = buildOldVersionCommand(versionDetail)
     }
 
     const gameArgsMap = {
         "${auth_player_name}": playerName,
         "${version_name}": "fuckingVersion",
-        "${game_directory}": getConfig(true).gameRoot,
-        "${assets_root}": getAssetPath(),
+        "${game_directory}": `"${getConfig(true).gameRoot}"`,
+        "${assets_root}": `"${getAssetPath()}"`,
         "${auth_uuid}": authUUID,
         "${auth_access_token}": accessToken,
         "${user_type}": userType,
         "${version_type}": "lala",
         "${resolution_width}": resolutionWidth,
         "${resolution_height}": resolutionHeight,
-        "${classpath}": buildClassPath(versionDetail),
+        "${classpath}": `"${buildClassPath(versionDetail)}"`,
         "${launcher_name}": launcherName,
         "${launcher_version}": launcherVersion,
         "${assets_index_name}": assetIndex.id,
@@ -111,6 +113,14 @@ function buildNewVersionCommand(versionDetail) {
     return `${javaPath} ${jvmArgs} ${logArgs} ${mainClass} ${gameArgs}`;
 }
 
+function buildOldVersionCommand(versionDetail) {
+    const { mainClass } = versionDetail;
+    const gameArgs = versionDetail.minecraftArguments
+    const javaPath = getJavaPath();
+    const logArgs = buildLogConfigPath(versionDetail)
+    return `${javaPath} ${"-cp ${classpath}"} ${logArgs} ${mainClass} ${gameArgs}`
+}
+
 function buildLogConfigPath(versionDetail) {
     const { logging } = versionDetail;
     const loggingPath = path.join(
@@ -119,7 +129,7 @@ function buildLogConfigPath(versionDetail) {
         "log_configs",
         logging.client.file.id
     );
-    return `-Dlog4j.configurationFile=${loggingPath}`;
+    return `"-Dlog4j.configurationFile=${loggingPath}"`;
 }
 
 function buildGameArgs(game) {
@@ -133,7 +143,7 @@ function buildGameArgs(game) {
 }
 
 function buildJVMArgs(jvm) {
-    const argumentList = ["-Xmx${max_memory}"];
+    let argumentList = ["-Xmx${max_memory}"];
     for (const argument of jvm) {
         if (typeof argument === "string") {
             argumentList.push(argument);
@@ -152,6 +162,14 @@ function buildJVMArgs(jvm) {
             );
         }
     }
+    argumentList = argumentList.map(arg => {
+        if (arg.startsWith('-D')) {
+            console.log(arg)
+            return `"${arg}"`
+        }
+        return arg
+    })
+    console.log(argumentList)
     return argumentList.join(" ");
 }
 
