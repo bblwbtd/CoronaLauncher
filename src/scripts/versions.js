@@ -1,11 +1,12 @@
 const { getConfig } = require('./config')
 const fs = require('fs')
 const path = require('path')
-const { validateFile } = require('./common')
+const { validateFile, ensureDirExist } = require('./common')
 
 const versionsDirPath = path.join(getConfig().gameRoot, 'versions')
 
 async function readAllVersions() {
+    ensureDirExist(versionsDirPath)
     const files = fs.readdirSync(versionsDirPath)
     const versions = []
     files.forEach(file => {

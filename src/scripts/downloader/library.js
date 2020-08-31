@@ -137,6 +137,7 @@ async function extractAllNativesLibrary(
     outDir = getDefaultNativeDir()
 ) {
     const { libraries } = versionDetail;
+    ensureDirExist(outDir)
     
     for (const library of libraries) {
         const { downloads } = library

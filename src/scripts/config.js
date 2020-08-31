@@ -5,7 +5,6 @@ const { escapeSpace } = require('./utils')
 const { v4 } = require('uuid')
 
 function getGameRoot() {
-    console.log()
     switch (os.platform()) {
         case 'darwin': 
             return `${os.homedir}/Library/Application Support/minecraft`

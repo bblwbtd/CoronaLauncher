@@ -11,7 +11,7 @@
                         <v-icon @click="() => showDeleteDialog(version.name)">mdi-delete</v-icon>
                     </v-btn>
                     <v-btn icon>
-                        <v-icon>mdi-play</v-icon>
+                        <v-icon @click="() => launch(version)">mdi-play</v-icon>
                     </v-btn>
                 </div>
             </v-list-item-action>
@@ -25,19 +25,19 @@
             <v-btn text color="green" @click="() => deleteVisible = false">{{$t('Cancel')}}</v-btn>
             <v-btn text color="red" @click="handleDeleteVersion">{{$t('Confirm')}}</v-btn>
         </CommonDialog>
-        <CommonSnackbar />
+        <LaunchDialog ref="launchDialog" />
     </v-list>
 </template>
 
 <script>
 import CommonDialog from './CommonDialog'
 import { removeVersion } from '../scripts/versions'
-import CommonSnackbar from './CommonSnackbar'
+import LaunchDialog from './LaunchDialog'
 
 export default {
   components: {
     CommonDialog,
-    CommonSnackbar
+    LaunchDialog
   },
   data: () => ({
     deleteContent: '',
@@ -54,6 +54,9 @@ export default {
       removeVersion(this.deleteTarget)
       this.deleteVisible = false
       this.$store.dispatch('refreshVersions')
+    },
+    launch(version) {
+      this.$refs.launchDialog.launch(version)
     }
   }
 }

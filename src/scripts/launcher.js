@@ -1,5 +1,5 @@
 const { system } = require("./common");
-const { isVitalDependence } = require("./downloader/library");
+const { isVitalDependence, extractAllNativesLibrary } = require("./downloader/library");
 const path = require("path");
 const { getConfig } = require("./config");
 const os = require("os");
@@ -9,37 +9,40 @@ const { ipcRenderer } = require("electron");
 function launch(versionDetail) {
     return new Promise((resolve, reject) => {
         const config = getConfig();
-        const command = buildCommand(
-            versionDetail,
-            config.currentUsername,
-            "123123",
-            "123132",
-            "Mojang",
-            config.width,
-            config.height,
-            config.maxMemory,
-            "CoronaLauncher",
-            "0.0.1",
-            ""
-        );
 
-        console.log(command);
-        const childProcess = exec(command);
-
-        childProcess.stdout.once('data', () => resolve())
-        childProcess.on('exit', (code) => {
-            if (code) {
-                reject(new Error(`${code}`))
-            }
+        extractAllNativesLibrary(versionDetail).then(() => {
+            const command = buildCommand(
+                versionDetail,
+                config.currentAccount.username,
+                "123123",
+                "123132",
+                "Mojang",
+                config.width,
+                config.height,
+                config.maxMemory,
+                "CoronaLauncher",
+                "0.0.1",
+                ""
+            );
+    
+            console.log(command);
+            const childProcess = exec(command);
+    
+            childProcess.stdout.once('data', () => resolve())
+            childProcess.on('exit', (code) => {
+                if (code) {
+                    reject(new Error(`${code}`))
+                }
+            })
+    
+            childProcess.stdout.on("data", message => {
+                console.log("info:" + message);
+            });
+    
+            childProcess.stderr.on("data", message => {
+                console.log("error:" + message);
+            });
         })
-
-        childProcess.stdout.on("data", message => {
-            console.log("info:" + message);
-        });
-
-        childProcess.stderr.on("data", message => {
-            console.log("error:" + message);
-        });
     });
 }
 

@@ -48,7 +48,7 @@
                     </div>
                 </v-row>
             </v-card-title>
-            <v-card-actions v-if="state === $t('MissingResources')">
+            <v-card-actions v-if="state === 'missingResources'">
                 <v-spacer></v-spacer>
                 <v-btn color="red" text @click="cancel">{{
                     $t("Cancel")
@@ -57,7 +57,7 @@
                     $t("DownloadAndStart")
                 }}</v-btn>
             </v-card-actions>
-            <v-card-actions v-if="state === $t('Downloading')">
+            <v-card-actions v-if="state === 'downloading'">
                 <v-spacer></v-spacer>
                 <v-btn @click="cancel" color="red" text>
                     {{ $t("Cancel") }}
@@ -86,6 +86,13 @@ export default {
         versionDetail: undefined,
         description: ''
     }),
+    watch: {
+        visible: function(value) {
+            if (!value) {
+                this.stopTimer()
+            }   
+        }
+    },
     methods: {
         cancel() {
             this.visible = false;
@@ -116,9 +123,30 @@ export default {
             this.progress = (transferredSize / totalSize) * 100;
             console.log(this.progress);
         },
+        startTimer() {
+            this.timerID = setInterval(async () => {
+                this.updateProgress();
+                if (this.progress >= 100) {
+                    this.stopTimer()
+                }
+            }, 500);
+        },
+        stopTimer() {
+            clearInterval(this.timerID)
+        },
         async launch(version) {
             this.version = version;
             this.visible = true;
+            console.log(this.version)
+            const mission = this.$store.state.missions.find(m => (m.name === version.name && m.state === 'Downloading'))
+            console.log(mission)
+            if (mission) {
+                this.missionID = mission.id
+                this.startTimer()
+                this.state = 'downloading'
+                this.description = this.$t('Downloading')
+                return
+            }
             this.state = 'validating';
             this.description = this.$t('ValidatingAsset')
             this.versionDetail = JSON.parse(
@@ -147,9 +175,7 @@ export default {
         },
         async downloadDependenceAndStart() {
             this.progress = 0;
-            this.timerID = setInterval(() => {
-                this.updateProgress();
-            }, 500);
+            this.startTimer()
             this.missionID = await scheduleDownloadTasks({
                 store: this.$store,
                 name: this.version.name,
@@ -157,7 +183,6 @@ export default {
                 callback: async () => {
                     this.progress = 100;
                     this.state = 'launching';
-                    clearInterval(this.timerID);
                     try {
                         await launch(this.versionDetail);
                     } catch (err) {
@@ -165,8 +190,8 @@ export default {
                     }
                 }
             });
-            console.log(this.missionID);
             this.state = 'downloading';
+            this.description = this.$t('Downloading')
         }
     }
 };

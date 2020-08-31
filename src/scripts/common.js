@@ -87,7 +87,6 @@ function patchDownload(tasks = [], downloadConfig = {}) {
                 task.sha1,
                 progress => {
                     task.transferred = progress.transferred;
-                    console.log(task);
                     emitProgress();
                 }
             );
