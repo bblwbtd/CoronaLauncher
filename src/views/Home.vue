@@ -66,7 +66,6 @@ export default {
     methods: {
         launchGame(version) {
             this.$refs.launchDialog.launch(version);
-            this.$store.dispatch('refreshConfig')
         },
         launchLast() {
             const last = this.$store.state.versions.find(version => version.name === this.$store.state.config.lastLaunch)

@@ -172,6 +172,7 @@ export default {
                 }
                 this.visible = false
             }
+            this.$store.dispatch('refreshConfig')
         },
         async downloadDependenceAndStart() {
             this.progress = 0;
