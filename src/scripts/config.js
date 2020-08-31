@@ -66,7 +66,8 @@ const defaultConfig = {
     language: 'en',
     closeLauncherOnStart: false,
     clientToken: v4(),
-    versionConfig: {}
+    versionConfig: {},
+    lastLaunch: 'Latest',
 }
 
 let configFromFile = {}

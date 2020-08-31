@@ -22,12 +22,12 @@ function findVersion(versionManifest, id) {
     return versions.find(version => version.id === id)
 }
 
-function writeVersionDetail(rawVersionDetail) {
+function writeVersionDetail(versionDetail) {
     const { gameRoot } = getConfig()
-    const { id } = JSON.parse(rawVersionDetail)
+    const { id } = versionDetail
     const filePath = path.join(gameRoot, 'versions', id, `${id}.json`)
     ensureDirExist(path.join(gameRoot, 'versions', id))
-    fs.writeFileSync(filePath, rawVersionDetail)
+    fs.writeFileSync(filePath, JSON.stringify(versionDetail))
 }
 
 function getLatestRelease(versionManifest) {

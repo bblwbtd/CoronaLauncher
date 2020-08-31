@@ -19,7 +19,7 @@ export default new Vuex.Store({
     },
     setConfig(state, config) {
       state.config = config,
-        applyAndWriteConfig(config)
+      applyAndWriteConfig(config)
     },
     setVersions(state, versions) {
       state.versions = versions
@@ -55,6 +55,9 @@ export default new Vuex.Store({
     refreshVersions({ commit }) {
       readAllVersions().then(versions => commit('setVersions', versions.reverse()))
     },
+    refreshConfig({ commit }){
+      commit('setConfig', getConfig())
+    }
   },
   modules: {
   }

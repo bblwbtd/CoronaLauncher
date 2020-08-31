@@ -1,7 +1,7 @@
 const { system } = require("./common");
 const { isVitalDependence, extractAllNativesLibrary } = require("./downloader/library");
 const path = require("path");
-const { getConfig } = require("./config");
+const { getConfig, applyAndWriteConfig } = require("./config");
 const os = require("os");
 const { exec } = require("child_process");
 const { ipcRenderer } = require("electron");
@@ -9,7 +9,8 @@ const { ipcRenderer } = require("electron");
 function launch(versionDetail) {
     return new Promise((resolve, reject) => {
         const config = getConfig();
-
+        config.lastLaunch = versionDetail.id
+        applyAndWriteConfig(config)
         extractAllNativesLibrary(versionDetail).then(() => {
             const command = buildCommand(
                 versionDetail,

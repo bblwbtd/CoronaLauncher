@@ -59,7 +59,7 @@ import {
     writeVersionDetail
 } from "../scripts/downloader/version";
 import { scheduleDownloadTasks } from "../scripts/common";
-import { validateResources } from "../scripts/launcher";
+import { validateResources, launch } from "../scripts/launcher";
 
 export default {
     props: {
@@ -140,13 +140,14 @@ export default {
             this.formData.name = this.formData.version;
         },
         async handleSave() {
+            const versionMeta = this.manifest.versions.find(
+                version => version.id === this.formData.version
+            );
+            const versionDetail = await fetchVersionDetail(versionMeta.url);
+            await writeVersionDetail(versionDetail);
             if (this.formData.downloadImmediately) {
                 this.loading = true;
-                const versionMeta = this.manifest.versions.find(
-                    version => version.id === this.formData.version
-                );
-                const versionDetail = await fetchVersionDetail(versionMeta.url);
-                await writeVersionDetail(JSON.stringify(versionDetail));
+
                 const tasks = await validateResources(
                     versionDetail,
                     this.formData.name
@@ -155,10 +156,20 @@ export default {
                 await scheduleDownloadTasks({
                     store: this.$store,
                     name: this.formData.name,
-                    tasks
+                    tasks,
+                    callback: async () => {
+                        if (this.formData.startGame) {
+                            try {
+                                await launch(versionDetail);
+                            } catch (err) {
+                                console.log(err);
+                            }
+                        }
+                    }
                 });
                 this.loading = false;
             }
+            this.$router.push('/versions')
         }
     }
 };

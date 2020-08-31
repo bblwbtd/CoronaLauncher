@@ -1,7 +1,11 @@
 <template>
-    <v-container style="padding: 0" fluid class="fill-height align-content-start justify-start">
+    <v-container
+        style="padding: 0"
+        fluid
+        class="fill-height align-content-start justify-start"
+    >
         <v-app-bar flat app>
-            <v-toolbar-title>{{$t('Home')}}</v-toolbar-title>
+            <v-toolbar-title>{{ $t("Home") }}</v-toolbar-title>
             <v-spacer></v-spacer>
             <DownloadButton />
         </v-app-bar>
@@ -9,56 +13,67 @@
             <div id="content">
                 <v-menu max-height="40vh" open-on-hover top offset-y>
                     <template v-slot:activator="{ on, attrs }">
-                        <v-btn :ripple="false" large id="op" v-on="on" v-bind="attrs">
+                        <v-btn
+                            :ripple="false"
+                            large
+                            id="op"
+                            v-on="on"
+                            v-bind="attrs"
+                            @click="launchLast"
+                        >
                             <div id="op_content">
-                                <div>{{$t('Play')}}</div>
-                                <div style="font-size: 0.8rem"></div>
+                                <div>{{ $t("Play") }}</div>
+                                <div style="font-size: 0.8rem">{{ $store.state.config.lastLaunch }}</div>
                             </div>
                         </v-btn>
                     </template>
                     <v-list dense>
-                      <v-list-item>
-                        {{$t('Latest')}}
-                      </v-list-item>
-                      <v-list-item @click="() => launchGame(version)" :key="version.name" v-for="version in $store.state.versions">
-                        <v-list-item-content>
-                          {{version.name}}
-                        </v-list-item-content>
-                      </v-list-item>
+                        <v-list-item
+                            @click="() => launchGame(version)"
+                            :key="version.name"
+                            v-for="version in $store.state.versions"
+                        >
+                            <v-list-item-content>
+                                {{ version.name }}
+                            </v-list-item-content>
+                        </v-list-item>
                     </v-list>
                 </v-menu>
             </div>
         </v-img>
-        <LaunchDialog ref="launchDialog">
-
-        </LaunchDialog>
+        <LaunchDialog ref="launchDialog"> </LaunchDialog>
     </v-container>
 </template>
 
 <script>
-import DownloadButton from '../components/DownloadButton'
-import LaunchDialog from '../components/LaunchDialog'
+import DownloadButton from "../components/DownloadButton";
+import LaunchDialog from "../components/LaunchDialog";
 
 export default {
-  name: 'Home',
-  components: {
-    DownloadButton,
-    LaunchDialog
-  },
-  mounted() {
-    
-  },
-  data(){
-    return {
-      visible: false
+    name: "Home",
+    components: {
+        DownloadButton,
+        LaunchDialog
+    },
+    mounted() {
+        this.$store.dispatch('refreshConfig')
+    },
+    data() {
+        return {
+            visible: false,
+        };
+    },
+    methods: {
+        launchGame(version) {
+            this.$refs.launchDialog.launch(version);
+            this.$store.dispatch('refreshConfig')
+        },
+        launchLast() {
+            const last = this.$store.state.versions.find(version => version.name === this.$store.state.config.lastLaunch)
+            this.$refs.launchDialog.launch(last);
+        }
     }
-  },
-  methods: {
-    launchGame(version) {
-      this.$refs.launchDialog.launch(version)
-    }
-  }
-}
+};
 </script>
 
 <style scoped>
