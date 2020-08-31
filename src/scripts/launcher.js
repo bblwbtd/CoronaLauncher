@@ -15,7 +15,7 @@ function launch(versionDetail) {
 
         let playerName = 'Steve'
         if (config.currentAccount) {
-            playerName = config.currentAccount.username
+            playerName = config.currentAccount.profile.name
         }
         extractAllNativesLibrary(versionDetail).then(() => {
             const command = buildCommand(
@@ -80,6 +80,7 @@ function buildCommand(
         "${version_name}": "fuckingVersion",
         "${game_directory}": `"${getConfig(true).gameRoot}"`,
         "${assets_root}": `"${getAssetPath()}"`,
+        "${game_assets}": `"${getAssetPath()}"`,
         "${auth_uuid}": authUUID,
         "${auth_access_token}": accessToken,
         "${user_type}": userType,
