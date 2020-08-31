@@ -6,3 +6,4 @@ logs
 #Electron-builder output
 /dist_electron
 .yarnrc
+config.json
