@@ -24,7 +24,6 @@ async function validateDependence(dependence) {
 }
 
 function validateArtifact(library) {
-    console.log(library)
     if (!library.downloads.artifact) return true
     return validateDependence(library.downloads.artifact)
 }
@@ -88,46 +87,56 @@ function downloadDependence(libraries, requestConfig, downloadConfig) {
 }
 
 function extractNativeLibrary(zipFile, outDir) {
-    const libraryExtensionMap = {
-        'osx': '.dylib|.jnilib',
-        'linux': '.so',
-        'windows': '.dll'
-    }
-    const extension = libraryExtensionMap[system]
-    const re = new RegExp(extension)
-    return new Promise((resolve, reject) => {
+
+    return new Promise((res, rej) => {
+        const libraryExtensionMap = {
+            'osx': '(.dylib|.jnilib)$',
+            'linux': '(.so)$',
+            'windows': '(.dll)$'
+        }
+        const extension = libraryExtensionMap[system]
+        const re = new RegExp(extension)
         const zip = new StreamZip({
             file: zipFile,
             storeEntries: true
         })
-
-        zip.on('error', (e) => reject(e))
+    
+        zip.on('error', (e) => {throw new Error(e)})
         
         zip.on('ready', () => {
-            const target = Object.keys(zip.entries()).find(v => re.test(v))
-            console.log(zip.entries())
-            if (target) {
-                const outPath = path.join(outDir, target)
-                ensureDirExist(outDir)
-                const writer = fs.createWriteStream(outPath)
-                zip.stream(target, (err, stream) => {
-                    if (err) {
-                        reject(err)
-                        return
-                    }
-                    stream.pipe(writer)
-                    stream.on('end', () => {
-                        zip.close()
-                        resolve()
+            const promises = []
+
+            Object.keys(zip.entries()).forEach(v => {
+                if (!re.test(v)) return
+                const outPath = path.join(outDir, v)
+                promises.push(new Promise((resolve, reject) => {
+                    ensureDirExist(outDir)
+                    const writer = fs.createWriteStream(outPath)
+                    zip.stream(v, (err, stream) => {
+                        if (err) {
+                            console.log(v)
+                            reject(new Error(err))
+                            return
+                        }
+                        stream.pipe(writer)
+                        stream.on('end', () => {
+                            // zip.close()
+                            resolve()
+                        })
+                        stream.on('error', (e) => {
+                            reject(new Error(e))
+                        } )
                     })
-                    stream.on('error', (e) => {
-                        reject(e)
-                    } )
-                })
-            } else {
-                reject(new Error('Can not find the library!'))
-            }
+                }))
+            })
+            
+            Promise.all(promises).then(() => {
+                res()
+            }).catch((e) => {
+                rej(new Error(e))
+            })
         })
+
     })
 }
 

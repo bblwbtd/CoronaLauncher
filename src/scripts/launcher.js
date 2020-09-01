@@ -200,7 +200,7 @@ function buildClassPath(versionDetail) {
         `${id}.jar`
     );
     librariesPaths.push(mainJarFilePath);
-    return librariesPaths.join(os.platform === "win32" ? ";" : ":");
+    return librariesPaths.join(os.platform() === "win32" ? ";" : ":");
 }
 
 function getAssetPath() {
