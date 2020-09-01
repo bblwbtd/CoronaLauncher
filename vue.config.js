@@ -1,3 +1,6 @@
+const CopyPlugin = require('copy-webpack-plugin')
+const path = require('path')
+
 module.exports = {
     transpileDependencies: ["vuetify"],
     pluginOptions: {
@@ -24,5 +27,16 @@ module.exports = {
             enableInSFC: true
         }
     },
-    configureWebpack: {}
+    configureWebpack: {
+        plugins: [
+            new CopyPlugin({
+                patterns: [
+                    {
+                        from: path.join(__dirname, 'src', 'scripts'),
+                        to: 'scripts'
+                    }
+                ]
+            })
+        ]
+    }
 };
