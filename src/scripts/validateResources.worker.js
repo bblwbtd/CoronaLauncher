@@ -14,7 +14,6 @@ const {
     transformLibraries2Tasks
 } = require("./downloader/library");
 const { copyClient } = require("./client");
-// const { expose } = require("threads/worker");
 
 const validateResources = async (versionDetail, name) => {
     if (!(await validateAssetIndex(versionDetail))) {
@@ -49,54 +48,8 @@ const validateResources = async (versionDetail, name) => {
     return tasks;
 };
 
-// expose({
-//     validateResources,
-// })
-
-// process.on('message', async (message) => {
-//     const {versionDetail, name} = message
-//     process.send(await validateResources(versionDetail, name))
-// })
-
 onmessage = async (e) => {
     const { versionDetail, name } = e.data
     const tasks = await validateResources(versionDetail, name)
     postMessage(tasks)
 }
-
-// addEventListener('message', async e => {
-//     const { versionDetail, name } = e.data
-//     const tasks = await validateResources(versionDetail, name)
-//     postMessage(tasks)
-// })
-
-// const {
-//     Worker,
-//     isMainThread,
-//     parentPort,
-//     workerData
-// } = require("worker_threads");
-
-// if (isMainThread) {
-//     module.exports = (versionDetail, name) => {
-//         return new Promise((resolve, reject) => {
-//             const worker = new Worker( __filename, {
-//                 workerData: { versionDetail, name }
-//             });
-//             worker.on("message", resolve);
-//             worker.on("error", reject);
-//             worker.on("exit", code => {
-//                 if (code !== 0)
-//                     reject(new Error(`工作线程使用退出码 ${code} 停止`));
-//             });
-//         });
-//     };
-// } else {
-//     const { versionDetail, name } = workerData;
-//     validateResources(versionDetail, name).then(tasks => {
-//         parentPort.postMessage(tasks);
-//     });
-// }
-
-
-// module.exports = validateResources
