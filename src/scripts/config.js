@@ -29,6 +29,9 @@ function getConfigDir() {
     }
 }
 
+const configDir = getConfigDir()
+const configPath = path.join(configDir, 'config.json')
+
 const defaultConfig = {
     mirrors: {
         official: {
@@ -84,8 +87,8 @@ const defaultConfig = {
 
 let configFromFile = {}
 
-if (fs.existsSync('config.json')) {
-    configFromFile = JSON.parse(fs.readFileSync('config.json').toString())
+if (fs.existsSync(configPath)) {
+    configFromFile = JSON.parse(fs.readFileSync(configPath).toString())
 }
 
 function getConfig() {
@@ -102,8 +105,8 @@ function getConfig() {
 }
 
 function writeConfig(config) {
-    ensureDirExist(getConfigDir())
-    fs.writeFileSync(path.join(getConfigDir(), 'config.json') ,JSON.stringify(config))
+    ensureDirExist(configDir)
+    fs.writeFileSync(configPath ,JSON.stringify(config))
 }
 
 function applyConfig(config) {
