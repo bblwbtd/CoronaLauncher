@@ -4,8 +4,9 @@ const os = require("os");
 const { getConfig } = require("./config");
 const got = require("got");
 const { pipeline } = require("stream");
-const crypto = require("crypto");
 const { v4 } = require("uuid");
+const sha1 = require("js-sha1")
+
 
 const systemMap = {
     darwin: "osx",
@@ -20,10 +21,7 @@ async function validateFile(path, hash) {
             return true;
         }
         let buf = fs.readFileSync(path);
-        let actualHash = crypto
-            .createHash("sha1")
-            .update(buf)
-            .digest("hex");
+        let actualHash = sha1(buf)
         // console.log(`${actualHash} ${hash}`)
         return actualHash === hash.toLowerCase();
     }

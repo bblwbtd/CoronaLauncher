@@ -20,6 +20,7 @@
     "core-js": "^3.6.5",
     "got": "^11.5.2",
     "node-stream-zip": "^1.11.2",
+    "js-sha1": "^0.6.0",
     "roboto-fontface": "*",
     "uuid": "^8.3.0",
     "vue": "^2.6.11",
@@ -49,7 +50,9 @@
     "vue-cli-plugin-i18n": "~1.0.1",
     "vue-cli-plugin-vuetify": "~2.0.7",
     "vue-template-compiler": "^2.6.11",
-    "vuetify-loader": "^1.6.0"
+    "vuetify-loader": "^1.6.0",
+    "worker-loader": "^3.0.2",
+    "worker-plugin": "^5.0.0"
   },
   "eslintConfig": {
     "root": true,

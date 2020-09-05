@@ -14,6 +14,7 @@ const {
     transformLibraries2Tasks
 } = require("./downloader/library");
 const { copyClient } = require("./client");
+// const { expose } = require("threads/worker");
 
 const validateResources = async (versionDetail, name) => {
     if (!(await validateAssetIndex(versionDetail))) {
@@ -48,16 +49,26 @@ const validateResources = async (versionDetail, name) => {
     return tasks;
 };
 
+// expose({
+//     validateResources,
+// })
+
 // process.on('message', async (message) => {
 //     const {versionDetail, name} = message
 //     process.send(await validateResources(versionDetail, name))
 // })
 
-// onmessage = async (e) => {
+onmessage = async (e) => {
+    const { versionDetail, name } = e.data
+    const tasks = await validateResources(versionDetail, name)
+    postMessage(tasks)
+}
+
+// addEventListener('message', async e => {
 //     const { versionDetail, name } = e.data
 //     const tasks = await validateResources(versionDetail, name)
 //     postMessage(tasks)
-// }
+// })
 
 // const {
 //     Worker,
@@ -88,4 +99,4 @@ const validateResources = async (versionDetail, name) => {
 // }
 
 
-module.exports = validateResources
+// module.exports = validateResources

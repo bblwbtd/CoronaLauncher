@@ -3,6 +3,7 @@ const os = require('os')
 const path = require('path')
 // const { escapeSpace } = require('./utils')
 const { v4 } = require('uuid')
+const { ensureDirExist } = require('./common')
 
 function getGameRoot() {
     switch (os.platform()) {
@@ -14,6 +15,17 @@ function getGameRoot() {
             return `${os.homedir}\\.minecraft`
         default:
             return `${os.homedir}/.minecraft`
+    }
+}
+
+function getConfigDir() {
+    switch (os.platform()) {
+        case 'darwin':
+            return `${os.homedir}/Library/Application Support/CoronaLauncher`
+        case 'linux':
+            return `${os.homedir}/.config`
+        case 'win32':
+            return `C:\\Program Files\\CoronaLauncher\\`
     }
 }
 
@@ -90,7 +102,8 @@ function getConfig() {
 }
 
 function writeConfig(config) {
-    fs.writeFileSync('config.json' ,JSON.stringify(config))
+    ensureDirExist(getConfigDir())
+    fs.writeFileSync(path.join(getConfigDir(), 'config.json') ,JSON.stringify(config))
 }
 
 function applyConfig(config) {

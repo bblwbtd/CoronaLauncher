@@ -4,7 +4,6 @@ const path = require("path");
 const { getConfig, applyAndWriteConfig } = require("./config");
 const os = require("os");
 const { exec } = require("child_process");
-const { ipcRenderer } = require("electron");
 const fs = require('fs')
 
 function launch(versionDetail) {
@@ -213,12 +212,12 @@ function getNativeDir() {
 
 function validateResources(versionDetail, name) {
     return new Promise(resolve => {
-        ipcRenderer.send("validate", { versionDetail, name });
-        ipcRenderer.once("validate_reply", (_event, args) => {
-            const missingResources = args;
-            console.log(missingResources);
-            resolve(missingResources);
-        });
+        const temp = require('./validateResources.worker.js')
+        const worker = new temp()
+        worker.onmessage = event => {
+            resolve(event.data)
+        }
+        worker.postMessage({ versionDetail, name })
     });
 }
 

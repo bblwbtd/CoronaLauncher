@@ -1,5 +1,3 @@
-const CopyPlugin = require('copy-webpack-plugin')
-const path = require('path')
 
 module.exports = {
     transpileDependencies: ["vuetify"],
@@ -9,14 +7,12 @@ module.exports = {
             builderOptions: {
                 productName: "CoronaLauncher",
                 copyright: "Copyright © 2020 Neboer",
-                mac: {
-                  
-                },
+                mac: {},
                 dmg: {
-                  window: {
-                    width: 800,
-                    height: 600
-                  }
+                    window: {
+                        width: 800,
+                        height: 600
+                    }
                 }
             }
         },
@@ -29,14 +25,17 @@ module.exports = {
     },
     configureWebpack: {
         plugins: [
-            new CopyPlugin({
-                patterns: [
-                    {
-                        from: path.join(__dirname, 'src', 'scripts'),
-                        to: 'scripts'
+        ],
+        module: {
+            rules: [
+                {
+                    test: /\.worker\.(c|m)?js$/i,
+                    loader: "worker-loader",
+                    options: {
+                        esModule: false
                     }
-                ]
-            })
-        ]
+                }
+            ]
+        }
     }
 };
