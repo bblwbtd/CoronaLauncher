@@ -195,6 +195,18 @@ function checkRules(rules) {
             result = false;
         }
     }
+    for (const rule of rules) {
+        if (
+            rule.action === "disallow" &&
+            rule.os.name === system
+        ) {
+            result = false;
+        } else if (rule.action === "allow") {
+            if (rule.os && rule.os.name && rule.os.name !== system) {
+                result = false;
+            }
+        }
+    }
     return result;
 }
 

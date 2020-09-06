@@ -25,7 +25,7 @@ function getConfigDir() {
         case 'linux':
             return `${os.homedir}/.config`
         case 'win32':
-            return `C:\\Program Files\\CoronaLauncher\\`
+            return `${os.homedir}\\CoronaLauncher`
     }
 }
 
