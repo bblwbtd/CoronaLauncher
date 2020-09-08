@@ -6,7 +6,7 @@
         </v-app-bar>
         <v-row justify="center">
             <v-col cols="10" md="8" lg="6">
-                <LoginForm />
+                <LoginForm :formData="{username, password, type}" />
             </v-col>
         </v-row>
     </v-container>
@@ -20,6 +20,10 @@ export default {
     components: {
         LoginForm,
         BackButton
+    },
+    props: ['username', 'password', 'type'],
+    mounted() {
+        console.log([this.username, this.password, this.type])
     }
 }
 </script>

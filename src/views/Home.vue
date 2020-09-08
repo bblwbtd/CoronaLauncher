@@ -9,6 +9,17 @@
             <v-spacer></v-spacer>
             <DownloadButton />
         </v-app-bar>
+        <v-banner single-line id="banner" v-if="$store.state.accountState === 'loginFailed'" color="red">
+            {{ $t("LoginFialed") }}
+            <template v-slot:actions="{}">
+                <v-btn text @click="redirectLogin">{{ $t("LoginAgain") }}</v-btn>
+                <v-btn
+                    text
+                    @click="$store.commit('setAccountState', 'dismiss')"
+                    >{{ $t("Dismiss") }}</v-btn
+                >
+            </template>
+        </v-banner>
         <v-img height="100%" src="../assets/minecraft.jpeg">
             <div id="content">
                 <v-menu max-height="40vh" open-on-hover top offset-y>
@@ -24,7 +35,9 @@
                         >
                             <div id="op_content">
                                 <div>{{ $t("Play") }}</div>
-                                <div style="font-size: 0.8rem">{{ $store.state.config.lastLaunch }}</div>
+                                <div style="font-size: 0.8rem">
+                                    {{ $store.state.config.lastLaunch }}
+                                </div>
                             </div>
                         </v-btn>
                     </template>
@@ -57,11 +70,11 @@ export default {
         LaunchDialog
     },
     mounted() {
-        this.$store.dispatch('refreshConfig')
+        this.$store.dispatch("refreshConfig");
     },
     data() {
         return {
-            visible: false,
+            visible: false
         };
     },
     methods: {
@@ -69,8 +82,20 @@ export default {
             this.$refs.launchDialog.launch(version);
         },
         launchLast() {
-            const last = this.$store.state.versions.find(version => version.name === this.$store.state.config.lastLaunch)
+            const last = this.$store.state.versions.find(
+                version => version.name === this.$store.state.config.lastLaunch
+            );
             this.$refs.launchDialog.launch(last);
+        },
+        redirectLogin() {
+            const account = this.$store.state.config.currentAccount;
+            this.$router.push({
+                path: "/login",
+                query: {
+                    username: account.username,
+                    type: 'Mojang'
+                }
+            });
         }
     }
 };
@@ -96,5 +121,11 @@ export default {
     width: 100%;
     display: flex;
     justify-content: center;
+}
+#banner {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    z-index: 1;
 }
 </style>

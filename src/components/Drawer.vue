@@ -18,7 +18,6 @@
                     {{$store.state.config.currentAccount.profile.name}}
                     <v-list-item-subtitle>{{$store.state.config.currentAccount.type}}{{accountStatus ? `(${accountStatus})` : ''}}</v-list-item-subtitle>
                 </v-list-item-title>
-                <v-spacer />
                 <CommonAvatar size="32px" :name="$store.state.config.currentAccount.profile.name" />
             </v-list-item>
             <v-divider />

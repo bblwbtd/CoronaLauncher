@@ -20,9 +20,9 @@ function launch(versionDetail) {
             const command = buildCommand(
                 versionDetail,
                 playerName,
-                "123123",
-                "123132",
-                "Mojang",
+                config.currentAccount.profile.id,
+                config.currentAccount.accessToken,
+                config.currentAccount.type,
                 config.width,
                 config.height,
                 config.maxMemory,

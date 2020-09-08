@@ -27,7 +27,10 @@ Vue.use(VueRouter)
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    props: (route) => ({
+      ...route.query
+    })
   },
   {
     path: '/versions/config',

@@ -60,5 +60,7 @@
   "DownloadNotification": "The game will start once download is finished. You can look up the progress in download center of upper right corner.",
   "DownloadAndStart": "Download and start",
   "Dismiss": "Dismiss",
-  "Launching": "Launching"
+  "Launching": "Launching",
+  "LoginFialed": "Login failed",
+  "LoginAgain": "Login again"
 }

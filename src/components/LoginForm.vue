@@ -17,7 +17,7 @@
                             v-model="formData.username"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="12" v-if="formData.type === 'Mojang'">
+                    <v-col cols="12" v-if="formData.type === 'mojang'">
                         <v-text-field
                             :rules="[(v) => v ? true : $t('CanNotBeEmpty')]"
                             :label="$t('Password')"
@@ -31,7 +31,7 @@
                             block
                             color="green"
                             :loading="loading"
-                        >{{ formData.type === 'Mojang' ? $t('Login') : $t('Add')}}</v-btn>
+                        >{{ formData.type === 'mojang' ? $t('Login') : $t('Add')}}</v-btn>
                     </v-col>
                 </v-row>
             </v-form>
@@ -51,14 +51,19 @@ export default {
     components: {
         CommonSnackbar,
     },
+    props: {
+        formData: {
+            type: Object,
+            defaunltValue: () => ( {
+                type: 'Mojang'
+            })
+        }
+    },
     data: () => ({
         config: getConfig(),
-        formData: {
-            type: 'Mojang',
-        },
         accountType: [
-            'Mojang',
-            'Offline'
+            'mojang',
+            'offline'
         ],
         loading: false,
     }),
@@ -76,22 +81,22 @@ export default {
                     return
                 }
                 switch(this.formData.type) {
-                    case 'Offline':
+                    case 'offline':
                         this.config.accounts = [{
                             id: v4(),
-                            type: 'Offline',
+                            type: 'offline',
                             username: this.formData.username,
                             profile: {
                                 name: this.formData.username
                             }
                         }].concat(this.config.accounts)
                         break
-                    case 'Mojang':
+                    case 'mojang':
                         try {
                             const response = await officialLogin(this.formData.username, this.formData.password)
                             this.config.accounts = [{
                                 id: v4(),
-                                type: 'Mojang',
+                                type: 'mojang',
                                 username: this.formData.username,
                                 accessToken: response.accessToken,
                                 profile: response.selectedProfile,

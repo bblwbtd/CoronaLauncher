@@ -12,10 +12,14 @@ export default new Vuex.Store({
     config: getConfig(),
     versions: [],
     missions: [],
+    accountState: 'unknown'
   },
   mutations: {
     setTab(state, tab) {
       state.tab = tab
+    },
+    setAccountState(state, accountState){
+      state.accountState = accountState
     },
     setConfig(state, config) {
       state.config = config,
