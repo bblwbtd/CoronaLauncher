@@ -9,15 +9,23 @@
             <v-spacer></v-spacer>
             <DownloadButton />
         </v-app-bar>
-        <v-banner single-line id="banner" v-if="$store.state.accountState === 'loginFailed'" color="red">
+        <v-banner
+            single-line
+            id="banner"
+            v-if="$store.state.accountState === 'loginFailed'"
+            color="red"
+        >
             {{ $t("LoginFialed") }}
             <template v-slot:actions="{}">
-                <v-btn text @click="redirectLogin">{{ $t("LoginAgain") }}</v-btn>
+                <v-btn text @click="redirectLogin">{{
+                    $t("LoginAgain")
+                }}</v-btn>
                 <v-btn
                     text
                     @click="$store.commit('setAccountState', 'dismiss')"
-                    >{{ $t("Dismiss") }}</v-btn
                 >
+                    {{ $t("Dismiss") }}
+                </v-btn>
             </template>
         </v-banner>
         <v-img height="100%" src="../assets/minecraft.jpeg">
@@ -93,7 +101,7 @@ export default {
                 path: "/login",
                 query: {
                     username: account.username,
-                    type: 'Mojang'
+                    type: "mojang"
                 }
             });
         }
