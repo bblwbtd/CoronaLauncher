@@ -4,13 +4,13 @@ const {
     system, 
     checkRules, 
     patchDownload,
-    ensureDirExist,
     getMirror,
     replaceHost
 } = require('../common')
 const { getConfig } = require('../config')
 const StreamZip = require('node-stream-zip')
 const fs = require('fs')
+const { ensureDirExist } = require('../utils')
 
 function getLibrariesPath() {
     const { gameRoot } = getConfig()

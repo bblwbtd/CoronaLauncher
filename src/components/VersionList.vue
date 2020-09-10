@@ -14,13 +14,24 @@
             <v-list-item-content>{{ version.name }}</v-list-item-content>
             <v-list-item-action>
                 <div style="display: flex">
-                    <v-btn icon>
+                    <v-btn
+                        icon
+                        @click="
+                            () =>
+                                $router.push({
+                                    path: '/versions/config',
+                                    query: { version: version.name }
+                                })
+                        "
+                    >
                         <v-icon>mdi-tune</v-icon>
                     </v-btn>
-                    <v-btn icon color="red">
-                        <v-icon @click="() => showDeleteDialog(version.name)"
-                            >mdi-delete</v-icon
-                        >
+                    <v-btn
+                        icon
+                        color="red"
+                        @click="() => showDeleteDialog(version.name)"
+                    >
+                        <v-icon>mdi-delete</v-icon>
                     </v-btn>
                     <v-btn icon>
                         <v-icon @click="() => launch(version)">mdi-play</v-icon>
@@ -60,6 +71,9 @@ export default {
         deleteVisible: false,
         deleteTarget: ""
     }),
+    mounted() {
+        this.$store.dispatch('refreshVersions')
+    },
     methods: {
         showDeleteDialog(version) {
             this.deleteContent = `${this.$t(

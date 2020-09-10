@@ -1,12 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-const { getConfig } = require("./config");
 const got = require("got");
 const { pipeline } = require("stream");
 const { v4 } = require("uuid");
-const sha1 = require("js-sha1")
-
+const sha1 = require("js-sha1");
+const { getConfig } = require("./config");
+const { ensureDirExist } = require("./utils")
 
 const systemMap = {
     darwin: "osx",
@@ -26,10 +26,6 @@ async function validateFile(path, hash) {
         return actualHash === hash.toLowerCase();
     }
     return false;
-}
-
-function ensureDirExist(dirPath) {
-    fs.mkdirSync(dirPath, { recursive: true });
 }
 
 function replaceHost(URL, host) {
@@ -290,7 +286,6 @@ module.exports = {
     patchDownload,
     system,
     download,
-    ensureDirExist,
     getMirror,
     replaceHost,
     scheduleDownloadTasks

@@ -3,7 +3,7 @@ const os = require('os')
 const path = require('path')
 // const { escapeSpace } = require('./utils')
 const { v4 } = require('uuid')
-const { ensureDirExist } = require('./common')
+const { ensureDirExist } = require('./utils')
 
 function getGameRoot() {
     switch (os.platform()) {
@@ -29,6 +29,17 @@ function getConfigDir() {
     }
 }
 
+function getCacheDir() {
+    switch (os.platform()) {
+        case 'darwin':
+            return `${os.homedir}/Library/Caches/CoronaLauncher`
+        case 'linux':
+            return `${os.homedir}/.cache`
+        case 'win32':
+            return `${os.homedir}\\CoronaLauncher\\cache` 
+    }
+}
+
 const configDir = getConfigDir()
 const configPath = path.join(configDir, 'config.json')
 
@@ -41,13 +52,13 @@ const defaultConfig = {
             assetIndex: 'launchermeta.mojang.com',
             client: 'launcher.mojang.com'
         },
-        BMCLAPI: {
-            versionManifest: 'bmclapi2.bangbang93.com/mc/game/version_manifest.json',
-            asset: 'bmclapi2.bangbang93.com/assets',
-            assetIndex: 'bmclapi2.bangbang93.com',
-            libraries: 'bmclapi2.bangbang93.com/maven',
-            client: 'bmclapi2.bangbang93.com'
-        }
+        // BMCLAPI: {
+        //     versionManifest: 'bmclapi2.bangbang93.com/mc/game/version_manifest.json',
+        //     asset: 'bmclapi2.bangbang93.com/assets',
+        //     assetIndex: 'bmclapi2.bangbang93.com',
+        //     libraries: 'bmclapi2.bangbang93.com/maven',
+        //     client: 'bmclapi2.bangbang93.com'
+        // }
     },
     currentMirror: 'official',
     gameRoot: getGameRoot(),
@@ -97,10 +108,6 @@ function getConfig() {
         ...configFromFile,
     }
 
-    // if (isEscapeSpace) {
-    //     config.gameRoot = escapeSpace(config.gameRoot)
-    //     config.nativePath = escapeSpace(config.nativePath) 
-    // }
     return config
 }
 
@@ -120,6 +127,7 @@ function applyAndWriteConfig(config) {
 
 module.exports = {
     getConfig,
+    getCacheDir,
     writeConfig,
     applyConfig,
     applyAndWriteConfig

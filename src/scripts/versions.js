@@ -1,7 +1,7 @@
 const { getConfig } = require('./config')
 const fs = require('fs')
 const path = require('path')
-const { ensureDirExist } = require('./common')
+const { ensureDirExist } = require('./utils')
 const { fetchVersionManifest, getLatestRelease, fetchVersionDetail, writeVersionDetail } = require('./downloader/version')
 
 const versionsDirPath = path.join(getConfig().gameRoot, 'versions')
@@ -23,10 +23,12 @@ async function readAllVersions() {
         const versionDetailFile = innerFiles.find(file => /.(json)$/.test(file))
         if (versionDetailFile) {
             const detailPath = path.join(versionDirPath, versionDetailFile)
+            const baseVersion = JSON.parse(fs.readFileSync(detailPath))
             versions.push({
                 name: file,
                 dirPath: versionDirPath,
-                detailFilePath: detailPath
+                detailFilePath: detailPath,
+                baseVersion,
             })
         }
     })
@@ -61,8 +63,17 @@ function removeVersion(version) {
     fs.rmdirSync(versionDirPath, { recursive: true })
 }
 
+function renameVersion(oldName, newName) {
+    const oldDirPath = path.join(versionsDirPath, oldName)
+    const newDirPath = path.join(versionsDirPath, newName)
+    console.log(oldDirPath)
+    console.log(newDirPath)
+    fs.renameSync(oldDirPath, newDirPath)
+}
+
 module.exports = {
     readAllVersions,
-    removeVersion
+    removeVersion,
+    renameVersion
 }
 

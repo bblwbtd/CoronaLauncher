@@ -1,4 +1,5 @@
 const os = require('os')
+const fs = require('fs')
 
 function escapeSpace(input = '') {
     if (os.platform() === 'win32') {
@@ -7,6 +8,11 @@ function escapeSpace(input = '') {
     return input.replace(' ', '\\ ')
 }
 
+function ensureDirExist(dirPath) {
+    fs.mkdirSync(dirPath, { recursive: true });
+}
+
 module.exports = {
-    escapeSpace
+    escapeSpace,
+    ensureDirExist
 }

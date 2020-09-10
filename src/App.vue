@@ -11,6 +11,7 @@
 import Drawer from '@/components/Drawer.vue'
 import { getConfig } from './scripts/config'
 import { officialValidateToken, officialRefresh, officialLogin } from './scripts/login'
+import { updateVersionManifest } from './scripts/downloader/version'
 
 export default {
   name: 'Home',
@@ -51,6 +52,7 @@ export default {
     this.$i18n.locale = getConfig().language
     this.$store.dispatch('refreshVersions')
     this.checkAccount()
+    updateVersionManifest()
   }
 }
 </script>

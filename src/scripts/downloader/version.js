@@ -1,13 +1,27 @@
-const { getConfig } = require('../config')
+const { getConfig, getCacheDir } = require('../config')
 const path = require('path')
 const fs = require('fs')
 const got = require('got')
-const { ensureDirExist, getMirror, replaceHost } = require('../common')
+const { getMirror, replaceHost } = require('../common')
+const { ensureDirExist } = require('../utils')
+
+const versionManifestPath = path.join(getCacheDir(), 'versionManifest.json')
 
 async function fetchVersionManifest() {
+    if (fs.existsSync(versionManifestPath)) {
+        console.log('hit')
+        return JSON.parse(fs.readFileSync(versionManifestPath))
+    }
+    console.log('miss')
+    return await updateVersionManifest()
+}
+
+async function updateVersionManifest() {
     const { mirrors, currentMirror } = getConfig()
     const { versionManifest } = mirrors[currentMirror]
     const { body } = await got('https://' + versionManifest, { responseType: 'json' })
+    ensureDirExist(getCacheDir())
+    fs.writeFileSync(versionManifestPath, JSON.stringify(body))
     return body
 }
 
@@ -41,4 +55,5 @@ module.exports = {
     writeVersionDetail,
     getLatestRelease,
     findVersion,
+    updateVersionManifest
 }

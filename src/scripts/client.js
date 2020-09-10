@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { getConfig } = require('./config')
-const { ensureDirExist } = require('./common')
+const { ensureDirExist } = require('./utils')
 
 function copyClient(from, to) {
     const { gameRoot } = getConfig()

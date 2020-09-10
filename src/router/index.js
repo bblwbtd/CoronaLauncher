@@ -35,7 +35,10 @@ Vue.use(VueRouter)
   {
     path: '/versions/config',
     name: 'VersionConfig',
-    component: VersionConfig
+    component: VersionConfig,
+    props: (route) => ({
+      ...route.query
+    })
   },
   {
     path: '/download',
