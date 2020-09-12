@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { readAllVersions } from '../scripts/versions'
 import { getConfig, applyAndWriteConfig } from '../scripts/config'
-
+import { fetchVersionManifest, getLatestRelease } from '../scripts/downloader/version'
 
 Vue.use(Vuex)
 
@@ -59,8 +59,15 @@ export default new Vuex.Store({
     refreshVersions({ commit }) {
       readAllVersions().then(versions => commit('setVersions', versions.reverse()))
     },
-    refreshConfig({ commit }){
-      commit('setConfig', getConfig())
+    async refreshConfig({ commit }){
+      const config = getConfig()
+      if (!config.lastLaunch) {
+        const versionDetail = await fetchVersionManifest()
+        const latest = getLatestRelease(versionDetail)
+        config.lastLaunch = latest.id
+      }
+      
+      commit('setConfig', config)
     }
   },
   modules: {

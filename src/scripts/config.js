@@ -25,7 +25,7 @@ function getConfigDir() {
         case 'linux':
             return `${os.homedir}/.config`
         case 'win32':
-            return `${os.homedir}\\.config\\CoronaLauncher`
+            return `${os.homedir}\\.CoronaLauncher`
     }
 }
 
@@ -36,7 +36,7 @@ function getCacheDir() {
         case 'linux':
             return `${os.homedir}/.cache`
         case 'win32':
-            return `${os.homedir}\\CoronaLauncher\\cache` 
+            return `${os.homedir}\\.CoronaLauncher\\cache` 
     }
 }
 

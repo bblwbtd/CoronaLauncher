@@ -27,6 +27,7 @@ export default {
     mounted() {
         this.$i18n.locale = getConfig().language;
         this.$store.dispatch("refreshVersions");
+        this.$store.dispatch("refreshConfig");
         checkAccount(this.$store);
         updateVersionManifest();
     }

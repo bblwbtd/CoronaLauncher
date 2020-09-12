@@ -44,7 +44,7 @@
                             <div id="op_content">
                                 <div>{{ $t("Play") }}</div>
                                 <div style="font-size: 0.8rem">
-                                    {{ $store.state.config.lastLaunch || $store.state.versions[0].name }}
+                                    {{ $store.state.config.lastLaunch }}
                                 </div>
                             </div>
                         </v-btn>
@@ -78,7 +78,6 @@ export default {
         LaunchDialog
     },
     mounted() {
-        this.$store.dispatch("refreshConfig");
     },
     data() {
         return {
