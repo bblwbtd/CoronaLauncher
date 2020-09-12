@@ -29,7 +29,8 @@ Vue.use(VueRouter)
     name: 'Login',
     component: Login,
     props: (route) => ({
-      ...route.query
+      ...route.query,
+      canEditType: route.query.canEditType !== 'false'
     })
   },
   {
