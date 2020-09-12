@@ -44,7 +44,7 @@
                             <div id="op_content">
                                 <div>{{ $t("Play") }}</div>
                                 <div style="font-size: 0.8rem">
-                                    {{ $store.state.config.lastLaunch }}
+                                    {{ $store.state.config.lastLaunch || $store.state.versions[0].name }}
                                 </div>
                             </div>
                         </v-btn>
@@ -89,9 +89,9 @@ export default {
         launchGame(version) {
             this.$refs.launchDialog.launch(version);
         },
-        launchLast() {
+        async launchLast() {
             const last = this.$store.state.versions.find(
-                version => version.name === this.$store.state.config.lastLaunch
+                version => version.name === ( this.$store.state.config.lastLaunch || this.$store.state.versions[0].name)
             );
             this.$refs.launchDialog.launch(last);
         },

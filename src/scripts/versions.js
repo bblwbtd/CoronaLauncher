@@ -46,15 +46,17 @@ async function readAllVersions() {
             const versionDetail = await fetchVersionDetail(latest.url)
             writeVersionDetail(versionDetail)
         }
-        versions.push({
-            name: 'Latest',
-            dirPath: versionDirPath,
-            detailFilePath: versionDetailFile
-        })
+        if (!versions.length) {
+            versions.push({
+                name: latest.id,
+                dirPath: versionDirPath,
+                detailFilePath: versionDetailFile
+            })
+        }
     } catch(err) {
         console.log(err)
     }
-
+    console.log(versions)
     return versions
 } 
 
@@ -66,8 +68,6 @@ function removeVersion(version) {
 function renameVersion(oldName, newName) {
     const oldDirPath = path.join(versionsDirPath, oldName)
     const newDirPath = path.join(versionsDirPath, newName)
-    console.log(oldDirPath)
-    console.log(newDirPath)
     fs.renameSync(oldDirPath, newDirPath)
 }
 

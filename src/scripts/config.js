@@ -25,7 +25,7 @@ function getConfigDir() {
         case 'linux':
             return `${os.homedir}/.config`
         case 'win32':
-            return `${os.homedir}\\CoronaLauncher`
+            return `${os.homedir}\\.config\\CoronaLauncher`
     }
 }
 
@@ -93,7 +93,6 @@ const defaultConfig = {
     closeLauncherOnStart: false,
     clientToken: v4(),
     versionConfig: {},
-    lastLaunch: 'Latest',
 }
 
 let configFromFile = {}
