@@ -63,7 +63,6 @@ const defaultConfig = {
     currentMirror: 'official',
     gameRoot: getGameRoot(),
     maxParallelDownload: 10,
-    nativePath: path.join(getGameRoot(), 'bin'),
     accounts: [
         {
             id: '2333',

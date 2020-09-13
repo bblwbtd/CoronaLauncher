@@ -4,7 +4,6 @@ const path = require("path");
 const { getConfig, applyAndWriteConfig } = require("./config");
 const os = require("os");
 const { exec } = require("child_process");
-const fs = require('fs')
 
 function launch(versionDetail) {
     return new Promise((resolve, reject) => {
@@ -39,7 +38,6 @@ function launch(versionDetail) {
                 if (code) {
                     reject(new Error(`${code}`))
                 }
-                fs.rmdirSync(getNativeDir(), { recursive: true })
             })
     
             childProcess.stdout.on("data", message => {
@@ -66,7 +64,7 @@ function buildCommand(
     launcherVersion,
     isDemo
 ) {
-    const { assetIndex } = versionDetail;
+    const { assetIndex, id } = versionDetail;
     let command = "";
     if (versionDetail.arguments) {
         command = buildNewVersionCommand(versionDetail);
@@ -90,7 +88,7 @@ function buildCommand(
         "${launcher_name}": launcherName,
         "${launcher_version}": launcherVersion,
         "${assets_index_name}": assetIndex.id,
-        "${natives_directory}": getNativeDir(),
+        "${natives_directory}": path.join(getConfig().gameRoot, 'versions', id, 'natives'),
         "${max_memory}": maxMemory
     };
 
@@ -206,9 +204,6 @@ function getAssetPath() {
     return path.join(getConfig(true).gameRoot, "assets");
 }
 
-function getNativeDir() {
-    return getConfig(true).nativePath;
-}
 
 function validateResources(versionDetail, name) {
     return new Promise(resolve => {

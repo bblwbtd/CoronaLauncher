@@ -105,10 +105,10 @@ function extractNativeLibrary(zipFile, outDir) {
         
         zip.on('ready', () => {
             const promises = []
-
             Object.keys(zip.entries()).forEach(v => {
                 if (!re.test(v)) return
                 const outPath = path.join(outDir, v)
+                if (fs.existsSync(outPath)) return
                 promises.push(new Promise((resolve, reject) => {
                     ensureDirExist(outDir)
                     const writer = fs.createWriteStream(outPath)
@@ -140,15 +140,11 @@ function extractNativeLibrary(zipFile, outDir) {
     })
 }
 
-function getDefaultNativeDir() {
-    return path.join(getConfig().gameRoot, 'bin')
-}
-
 async function extractAllNativesLibrary(
-    versionDetail, 
-    outDir = getDefaultNativeDir()
+    versionDetail 
 ) {
-    const { libraries } = versionDetail;
+    const { libraries, id } = versionDetail;
+    const outDir = path.join(getConfig().gameRoot, 'versions', id, 'natives')
     ensureDirExist(outDir)
     
     for (const library of libraries) {
