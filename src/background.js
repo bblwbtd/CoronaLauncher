@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, globalShortcut } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
@@ -50,6 +50,12 @@ function createWindow() {
   })
 }
 
+function registerKeys() {
+  globalShortcut.register('f12', () => {
+    win.webContents.openDevTools()
+  })
+}
+
 app.on('browser-window-created',function(e,window) {
   window.setMenuBarVisibility(false);
 });
@@ -83,6 +89,7 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
+  registerKeys()
   createWindow()
 })
 
