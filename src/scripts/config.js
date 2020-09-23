@@ -85,9 +85,6 @@ const defaultConfig = {
             name: 'Steve'
         }
     },
-    width: 800,
-    height: 600,
-    maxMemory: '2G',
     language: 'en',
     closeLauncherOnStart: false,
     clientToken: v4(),
