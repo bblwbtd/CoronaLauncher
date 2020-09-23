@@ -4,7 +4,7 @@
             @change="fillVersionName"
             v-model="formData.version"
             :label="$t('Versions')"
-            :items="versions"
+            :items="finalVersions"
             :disabled="!canEditVersion"
         >
             <template v-slot:prepend-item>
@@ -48,21 +48,11 @@
                 :label="$t('StartGameWhenDownloadFinish')"
             />
         </div>
-        <v-btn class="mt-5" color="green" :loading="loading" @click="handleSave">{{
-            $t("Save")
-        }}</v-btn>
     </v-form>
 </template>
 
 <script>
-import {
-    fetchVersionManifest,
-    fetchVersionDetail,
-    writeVersionDetail
-} from "../scripts/downloader/version";
-import { scheduleDownloadTasks } from "../scripts/common";
-import { validateResources, launch } from "../scripts/launcher";
-import { renameVersion } from '../scripts/versions';
+
 
 export default {
     props: {
@@ -75,70 +65,42 @@ export default {
                 startGame: false
             })
         },
+        versions: {
+            type: Array,
+            default: () => []
+        },
         showDownload: {
             type: Boolean,
             default: true
         },
         canEditName: {
             type: Boolean,
-            default: true,
+            default: true
         },
         canEditVersion: {
             type: Boolean,
             default: true
         }
     },
-    async mounted() {
-        this.manifest = await fetchVersionManifest();
-        this.fetchVersions();
-    },
-    watch: {
-        showRelease: function() {
-            this.fetchVersions();
-        },
-        showSnapShot: function() {
-            this.fetchVersions();
-        },
-        search: function() {
-            this.fetchVersions();
-        },
-        formData: function() {
-            console.log('change')
-            this.originalFormData = {...this.formData}
+    computed: {
+        finalVersions: function() {
+            return this.versions.filter(version => {
+
+                if (!this.showRelease && version.type === 'release') return false
+
+                if (!this.showSnapShot && version.type === 'snapshot') return false
+
+                return version.id.includes(this.search)
+            }).map(v => ({ text: `${v.type} ${v.id}`, value: v.id }))
         }
     },
     data: () => ({
-        versions: [],
-        manifest: {},
         showRelease: true,
-        showSnapShot: false,
+        showSnapShot: true,
         search: "",
         loading: false,
-        originalFormData: {}
     }),
     methods: {
-        async fetchVersions() {
-            try {
-                const results = [];
-                this.manifest.versions.forEach(version => {
-                    const { type, id } = version;
-                    if (
-                        (type === "snapshot" && this.showSnapShot) ||
-                        (type === "release" && this.showRelease)
-                    ) {
-                        results.push({
-                            text: `${type} ${id}`,
-                            value: id
-                        });
-                    }
-                });
-                this.versions = results.filter(data =>
-                    data.text.includes(this.search)
-                );
-            } catch (e) {
-                this.$emit("error", e);
-            }
-        },
         versionNameRule() {
             return [
                 value => {
@@ -149,7 +111,8 @@ export default {
                     if (
                         this.$store.state.versions.find(
                             version => version.name === value
-                        ) && this.canEditName
+                        ) &&
+                        this.canEditName
                     )
                         return this.$t("NameExisted");
                     return true;
@@ -158,43 +121,6 @@ export default {
         },
         fillVersionName() {
             this.formData.name = this.formData.version;
-        },
-        async handleSave() {
-            if (this.originalFormData.name) {
-                renameVersion(this.originalFormData.name, this.formData.name)
-                this.$router.push('/versions')
-                return
-            }
-            const versionMeta = this.manifest.versions.find(
-                version => version.id === this.formData.version
-            );
-            const versionDetail = await fetchVersionDetail(versionMeta.url);
-            await writeVersionDetail(versionDetail);
-            if (this.formData.downloadImmediately) {
-                this.loading = true;
-
-                const tasks = await validateResources(
-                    versionDetail,
-                    this.formData.name
-                );
-
-                await scheduleDownloadTasks({
-                    store: this.$store,
-                    name: this.formData.name,
-                    tasks,
-                    callback: async () => {
-                        if (this.formData.startGame) {
-                            try {
-                                await launch(versionDetail);
-                            } catch (err) {
-                                console.log(err);
-                            }
-                        }
-                    }
-                });
-                this.loading = false;
-            }
-            this.$router.push('/versions')
         }
     }
 };

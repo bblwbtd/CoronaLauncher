@@ -62,5 +62,11 @@
   "Dismiss": "Dismiss",
   "Launching": "Launching",
   "LoginFialed": "Login failed",
-  "LoginAgain": "Login again"
+  "LoginAgain": "Login again",
+  "GameConfig": "Game config",
+  "Memory": "Memory",
+  "height": "Height",
+  "width": "Width",
+  "AdvancedConfig": "AdvancedConfig",
+  "JVMArgument": "JVM argument"
 }

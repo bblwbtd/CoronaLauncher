@@ -61,5 +61,11 @@
   "DownloadAndStart": "下载并启动",
   "Dismiss": "隐藏",
   "LoginFialed": "登录失败",
-  "LoginAgain": "重新登录"
+  "LoginAgain": "重新登录",
+  "GameConfig": "游戏设置",
+  "Memory": "内存",
+  "width": "屏幕宽度",
+  "height": "屏幕高度",
+  "AdvancedConfig": "高级设置",
+  "JVMArgument": "JVM 参数"
 }

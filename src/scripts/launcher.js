@@ -1,7 +1,7 @@
 const { system } = require("./common");
 const { isVitalDependence, extractAllNativesLibrary } = require("./downloader/library");
 const path = require("path");
-const { getConfig, applyAndWriteConfig } = require("./config");
+const { getConfig, applyAndWriteConfig, getDefaultVersionConfig } = require("./config");
 const os = require("os");
 const { exec } = require("child_process");
 
@@ -10,6 +10,9 @@ function launch(versionDetail) {
         const config = getConfig();
         config.lastLaunch = versionDetail.id
         applyAndWriteConfig(config)
+
+        const advanceConfig = config.versionConfig[versionDetail.id] || getDefaultVersionConfig()
+        const { width, height, memory, jvmArgs } = advanceConfig
 
         let playerName = 'Steve'
         if (config.currentAccount) {
@@ -22,12 +25,13 @@ function launch(versionDetail) {
                 config.currentAccount.profile.id,
                 config.currentAccount.accessToken,
                 config.currentAccount.type,
-                config.width,
-                config.height,
-                config.maxMemory,
+                width,
+                height,
+                memory,
                 "CoronaLauncher",
                 "0.0.1",
-                ""
+                "",
+                jvmArgs
             );
     
             console.log(command);
@@ -62,7 +66,8 @@ function buildCommand(
     maxMemory,
     launcherName,
     launcherVersion,
-    isDemo
+    isDemo,
+    extraArgs = ''
 ) {
     const { assetIndex, id } = versionDetail;
     let command = "";
@@ -89,7 +94,8 @@ function buildCommand(
         "${launcher_version}": launcherVersion,
         "${assets_index_name}": assetIndex.id,
         "${natives_directory}": path.join(getConfig().gameRoot, 'versions', id, 'natives'),
-        "${max_memory}": maxMemory
+        "${max_memory}": maxMemory,
+        "${extra_args}": extraArgs
     };
 
     Object.keys(gameArgsMap).forEach(key => {
@@ -123,7 +129,7 @@ function buildOldVersionCommand(versionDetail) {
     const gameArgs = versionDetail.minecraftArguments
     const javaPath = getJavaPath();
     const logArgs = buildLogConfigPath(versionDetail)
-    return `${javaPath} ${"-cp ${classpath}"} ${'"-Djava.library.path=${natives_directory}"'} ${'-Xmx${max_memory}'} ${logArgs} ${mainClass} ${gameArgs}`
+    return `${javaPath} ${"-cp ${classpath}"} ${'"-Djava.library.path=${natives_directory}"'} ${'-Xmx${max_memory}'} ${'${extra_args}'} ${logArgs} ${mainClass} ${gameArgs}`
 }
 
 function buildLogConfigPath(versionDetail) {

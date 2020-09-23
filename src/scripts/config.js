@@ -94,6 +94,15 @@ const defaultConfig = {
     versionConfig: {},
 }
 
+function getDefaultVersionConfig() {
+    return {
+        width: 800,
+        height: 600,
+        memory: '2G',
+        jvmArgs: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M'
+    }
+}
+
 let configFromFile = {}
 
 if (fs.existsSync(configPath)) {
@@ -128,5 +137,6 @@ module.exports = {
     getCacheDir,
     writeConfig,
     applyConfig,
-    applyAndWriteConfig
+    applyAndWriteConfig,
+    getDefaultVersionConfig
 }

@@ -10,7 +10,7 @@
 <script>
 import Drawer from "@/components/Drawer.vue";
 import { getConfig } from "./scripts/config";
-import { checkAccount } from "./scripts/login";
+// import { checkAccount } from "./scripts/login";
 import { updateVersionManifest } from "./scripts/downloader/version";
 
 export default {
@@ -28,7 +28,7 @@ export default {
         this.$i18n.locale = getConfig().language;
         this.$store.dispatch("refreshVersions");
         this.$store.dispatch("refreshConfig");
-        checkAccount(this.$store);
+        // checkAccount(this.$store);
         updateVersionManifest();
     }
 };
