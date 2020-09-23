@@ -8,7 +8,6 @@
                 <v-tabs v-model="tab" hide-slider>
                     <v-tab>{{$t('BasicConfig')}}</v-tab>
                     <v-tab>{{$t('Accounts')}}</v-tab>
-                    <v-tab>{{$t('Storage')}}</v-tab>
                     <v-tab>{{$t('About')}}</v-tab>
                 </v-tabs>
             </template>
@@ -20,7 +19,7 @@
         </v-row>
         <v-row no-gutters class="align-start align-content-start" justify="center" v-if="tab === 1">
             <v-col align-self="start" cols="12" md="8" lg="6">
-                <AccountConfig v-if="tab === 1" />
+                <AccountConfig />
             </v-col>
         </v-row>
     </v-container>
@@ -36,7 +35,7 @@ export default {
     components: {
         BasicConfigForm, 
         AccountConfig,
-        DownloadButton
+        DownloadButton,
     },
     mounted() {
         this.tab = this.$store.state.tab

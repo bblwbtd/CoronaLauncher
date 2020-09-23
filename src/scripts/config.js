@@ -89,6 +89,7 @@ const defaultConfig = {
     closeLauncherOnStart: false,
     clientToken: v4(),
     versionConfig: {},
+    debug: false
 }
 
 function getDefaultVersionConfig() {
