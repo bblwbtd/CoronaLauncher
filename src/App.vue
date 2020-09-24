@@ -28,7 +28,7 @@ export default {
         this.$i18n.locale = getConfig().language;
         this.$store.dispatch("refreshVersions");
         this.$store.dispatch("refreshConfig");
-        if (this.$store.state.config.debug) {
+        if (!this.$store.state.config.debug) {
             checkAccount(this.$store);
         }
         updateVersionManifest();

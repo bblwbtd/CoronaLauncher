@@ -144,7 +144,7 @@ function buildLogConfigPath(versionDetail) {
 }
 
 function buildGameArgs(game) {
-    const argumentList = [];
+    const argumentList = ['--width', '${resolution_width}', '--height', '${resolution_height}'];
     for (const argument of game) {
         if (typeof argument === "string") {
             argumentList.push(argument);
