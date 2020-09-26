@@ -1,5 +1,6 @@
 <template>
     <v-app>
+        <AppBar></AppBar>
         <Drawer />
         <v-main>
             <router-view></router-view>
@@ -9,14 +10,17 @@
 
 <script>
 import Drawer from "@/components/Drawer.vue";
+import AppBar from "./components/AppBar";
 import { getConfig } from "./scripts/config";
 import { checkAccount } from "./scripts/login";
 import { updateVersionManifest } from "./scripts/downloader/version";
 
+
 export default {
     name: "Home",
     components: {
-        Drawer
+        Drawer,
+        AppBar
     },
     data: () => ({
         config: {}

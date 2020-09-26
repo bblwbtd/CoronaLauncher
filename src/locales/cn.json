@@ -67,5 +67,6 @@
   "width": "屏幕宽度",
   "height": "屏幕高度",
   "AdvancedConfig": "高级设置",
-  "JVMArgument": "JVM 参数"
+  "JVMArgument": "JVM 参数",
+  "CoronaLauncher": "日冕启动器"
 }

@@ -68,5 +68,6 @@
   "height": "Height",
   "width": "Width",
   "AdvancedConfig": "AdvancedConfig",
-  "JVMArgument": "JVM argument"
+  "JVMArgument": "JVM argument",
+  "CoronaLauncher": "Corona Launcher"
 }
