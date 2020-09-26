@@ -23,7 +23,7 @@ function getConfigDir() {
         case 'darwin':
             return `${os.homedir}/Library/Application Support/CoronaLauncher`
         case 'linux':
-            return `${os.homedir}/.config`
+            return `${os.homedir}/.config/CoronaLauncher`
         case 'win32':
             return `${os.homedir}\\.CoronaLauncher`
     }

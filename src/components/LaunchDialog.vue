@@ -71,6 +71,7 @@
 import fs from "fs";
 import { scheduleDownloadTasks } from "../scripts/common";
 import { validateResources, launch } from "../scripts/launcher";
+import { downloadAssetIndex, validateAssetIndex } from '../scripts/downloader/asset';
 
 export default {
     name: "LaunchDialog",
@@ -137,9 +138,7 @@ export default {
         async launch(version) {
             this.version = version;
             this.visible = true;
-            console.log(this.version)
             const mission = this.$store.state.missions.find(m => (m.name === version.name && m.state === 'Downloading'))
-            console.log(mission)
             if (mission) {
                 this.missionID = mission.id
                 this.startTimer()
@@ -152,7 +151,12 @@ export default {
             this.versionDetail = JSON.parse(
                 fs.readFileSync(version.detailFilePath).toString()
             );
+            if (!(await validateAssetIndex(this.versionDetail))) {
+                const [promise] = downloadAssetIndex(this.versionDetail);
+                await promise;
+            }
 
+            console.debug('validating resources')
             this.missingResources = await validateResources(
                 this.versionDetail,
                 version.name
@@ -184,13 +188,16 @@ export default {
                 callback: async () => {
                     this.progress = 100;
                     this.state = 'launching';
+                    this.description = this.$t('Launching')
                     try {
                         await launch(this.versionDetail);
                     } catch (err) {
                         console.log(err)
                     }
+                    this.visible = false
                 }
             });
+            console.log('change to download')
             this.state = 'downloading';
             this.description = this.$t('Downloading')
         }

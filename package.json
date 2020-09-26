@@ -18,7 +18,7 @@
   "dependencies": {
     "@mdi/font": "^3.6.95",
     "core-js": "^3.6.5",
-    "got": "^11.5.2",
+    "got": "^11.7.0",
     "node-stream-zip": "^1.11.2",
     "js-sha1": "^0.6.0",
     "roboto-fontface": "*",
