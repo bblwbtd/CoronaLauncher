@@ -69,6 +69,7 @@
 
 <script>
 import fs from "fs";
+import os from "os";
 import { scheduleDownloadTasks } from "../scripts/common";
 import { validateResources, launch } from "../scripts/launcher";
 import { downloadAssetIndex, validateAssetIndex } from '../scripts/downloader/asset';
@@ -151,7 +152,8 @@ export default {
             this.versionDetail = JSON.parse(
                 fs.readFileSync(version.detailFilePath).toString()
             );
-            if (!(await validateAssetIndex(this.versionDetail))) {
+            
+            if (os === 'linux' && !(await validateAssetIndex(this.versionDetail))) {
                 const [promise] = downloadAssetIndex(this.versionDetail);
                 await promise;
             }

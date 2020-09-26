@@ -1,7 +1,7 @@
 const {
     validateAllAsset,
-    // validateAssetIndex,
-    // downloadAssetIndex,
+    validateAssetIndex,
+    downloadAssetIndex,
     transformAssetObjects2Task
 } = require("./downloader/asset.js");
 const {
@@ -14,8 +14,15 @@ const {
     transformLibraries2Tasks
 } = require("./downloader/library");
 const { copyClient } = require("./client");
+const os = require('os')
 
 const validateResources = async (versionDetail, name) => {
+    if (os !== 'linux') {
+        if (!(await validateAssetIndex(versionDetail))) {
+            const [promise] = downloadAssetIndex(versionDetail);
+            await promise;
+        }
+    }
 
     const assetDownloadTasks = transformAssetObjects2Task(
         await validateAllAsset(versionDetail)
