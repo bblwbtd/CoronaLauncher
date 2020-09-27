@@ -5,6 +5,7 @@ module.exports = {
         electronBuilder: {
             nodeIntegration: true,
             builderOptions: {
+                appId: 'fun.ldgame.CoronaLauncher',
                 productName: "CoronaLauncher",
                 copyright: "Copyright © 2020 Neboer",
                 mac: {},
@@ -14,6 +15,9 @@ module.exports = {
                         height: 600
                     }
                 }
+            },
+            extraMetadata: {
+                name: 'CoronaLauncher'
             }
         },
         i18n: {

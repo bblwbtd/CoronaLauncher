@@ -34,7 +34,7 @@ function getCacheDir() {
         case 'darwin':
             return `${os.homedir}/Library/Caches/CoronaLauncher`
         case 'linux':
-            return `${os.homedir}/.cache`
+            return `${os.homedir}/.cache/CoronaLauncher`
         case 'win32':
             return `${os.homedir}\\.CoronaLauncher\\cache` 
     }

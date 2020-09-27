@@ -1,28 +1,18 @@
 <template>
     <v-system-bar app window dark id="bar">
         <div id="back">
-            <div v-if="os === 'darwin'" class="ml-3">
-                <v-icon class="op" @click="minimize">mdi-minus</v-icon>
-                <v-icon class="op" @click="maximize" v-if="showMaximize"
-                    >mdi-checkbox-blank-outline</v-icon
-                >
-                <v-icon class="op" @click="unMaximize" v-else
-                    >mdi-checkbox-multiple-blank-outline</v-icon
-                >
-                <v-icon class="op" @click="close">mdi-close</v-icon>
-            </div>
-            <div v-if="os !== 'darwin'" style="width: 84px" />
-            <div>{{$t('CoronaLauncher')}}</div>
+            <div style="width: 84px" />
+            <div style="user-select: none">{{$t('CoronaLauncher')}}</div>
             <div v-if="os === 'darwin'" style="width: 84px" />
             <div v-if="os !== 'darwin'">
-                <v-icon class="op" @click="minimize">mdi-minus</v-icon>
-                <v-icon class="op" @click="maximize" v-if="showMaximize"
+                <v-icon size="small" class="op" @click="minimize">mdi-minus</v-icon>
+                <v-icon size="small" class="op" @click="maximize" v-if="showMaximize"
                     >mdi-checkbox-blank-outline</v-icon
                 >
-                <v-icon class="op" @click="unMaximize" v-else
+                <v-icon size="small" class="op" @click="unMaximize" v-else
                     >mdi-checkbox-multiple-blank-outline</v-icon
                 >
-                <v-icon class="op" @click="close">mdi-close</v-icon>
+                <v-icon size="small" class="op" @click="close">mdi-close</v-icon>
             </div>
         </div>
     </v-system-bar>

@@ -94,9 +94,17 @@ export default {
             }).map(v => ({ text: `${v.type} ${v.id}`, value: v.id }))
         }
     },
+    watch: {
+        formData: {
+            handler: function(newFormData) {
+                if (!newFormData.downloadImmediately) this.formData.startGame = false
+            },
+            deep: true
+        }
+    },
     data: () => ({
         showRelease: true,
-        showSnapShot: true,
+        showSnapShot: false,
         search: "",
         loading: false,
     }),

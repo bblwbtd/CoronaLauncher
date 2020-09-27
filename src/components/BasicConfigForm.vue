@@ -26,11 +26,11 @@ export default {
             config: getConfig(),
             languages: [
                 {
-                    text: "🇨🇳简体中文",
+                    text: "🇨🇳 简体中文",
                     value: "cn",
                 },
                 {
-                    text: "🇺🇸English",
+                    text: "🇺🇸 English",
                     value: "en",
                 },
             ],

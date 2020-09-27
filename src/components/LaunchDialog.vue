@@ -1,5 +1,9 @@
 <template>
-    <v-dialog persistent width="400" v-model="visible">
+    <v-dialog
+        :persistent="['validating', 'launching'].includes(state)"
+        width="400"
+        v-model="visible"
+    >
         <v-card>
             <v-card-title id="content">
                 <v-row
@@ -10,12 +14,7 @@
                 >
                     <div id="item">
                         <v-progress-circular
-                            v-if="
-                                [
-                                   'validating',
-                                   'launching'
-                                ].includes(state)
-                            "
+                            v-if="['validating', 'launching'].includes(state)"
                             color="primary"
                             size="50"
                             indeterminate
@@ -28,7 +27,7 @@
                             size="50"
                             rotate="-90"
                         >
-                            {{ Math.ceil(progress) }}
+                            {{ Math.floor(progress) }}
                         </v-progress-circular>
                         <v-icon
                             v-if="state === 'missingResources'"
@@ -37,11 +36,7 @@
                         >
                             mdi-file-alert-outline
                         </v-icon>
-                        <v-icon
-                            v-if="state === 'failed'"
-                        >
-                        
-                        </v-icon>
+                        <v-icon v-if="state === 'failed'"> </v-icon>
                         <div class="mt-5" style="text-align: center">
                             {{ description }}
                         </div>
@@ -72,27 +67,30 @@ import fs from "fs";
 import os from "os";
 import { scheduleDownloadTasks } from "../scripts/common";
 import { validateResources, launch } from "../scripts/launcher";
-import { downloadAssetIndex, validateAssetIndex } from '../scripts/downloader/asset';
+import {
+    downloadAssetIndex,
+    validateAssetIndex
+} from "../scripts/downloader/asset";
 
 export default {
     name: "LaunchDialog",
     computed: {},
     data: () => ({
         visible: false,
-        state: 'validating',
+        state: "validating",
         version: undefined,
         missingResources: [],
         missionID: null,
         progress: 0,
         timerID: undefined,
         versionDetail: undefined,
-        description: ''
+        description: ""
     }),
     watch: {
         visible: function(value) {
             if (!value) {
-                this.stopTimer()
-            }   
+                this.stopTimer();
+            }
         }
     },
     methods: {
@@ -129,36 +127,41 @@ export default {
             this.timerID = setInterval(async () => {
                 this.updateProgress();
                 if (this.progress >= 100) {
-                    this.stopTimer()
+                    this.stopTimer();
                 }
             }, 500);
         },
         stopTimer() {
-            clearInterval(this.timerID)
+            clearInterval(this.timerID);
         },
         async launch(version) {
             this.version = version;
             this.visible = true;
-            const mission = this.$store.state.missions.find(m => (m.name === version.name && m.state === 'Downloading'))
+            const mission = this.$store.state.missions.find(
+                m => m.name === version.name && m.state === "Downloading"
+            );
             if (mission) {
-                this.missionID = mission.id
-                this.startTimer()
-                this.state = 'downloading'
-                this.description = this.$t('Downloading')
-                return
+                this.missionID = mission.id;
+                this.startTimer();
+                this.state = "downloading";
+                this.description = this.$t("Downloading");
+                return;
             }
-            this.state = 'validating';
-            this.description = this.$t('ValidatingAsset')
+            this.state = "validating";
+            this.description = this.$t("ValidatingAsset");
             this.versionDetail = JSON.parse(
                 fs.readFileSync(version.detailFilePath).toString()
             );
-            
-            if (os === 'linux' && !(await validateAssetIndex(this.versionDetail))) {
+
+            if (
+                os === "linux" &&
+                !(await validateAssetIndex(this.versionDetail))
+            ) {
                 const [promise] = downloadAssetIndex(this.versionDetail);
                 await promise;
             }
 
-            console.debug('validating resources')
+            console.debug("validating resources");
             this.missingResources = await validateResources(
                 this.versionDetail,
                 version.name
@@ -166,42 +169,42 @@ export default {
             console.log(this.missingResources);
 
             if (this.missingResources.length) {
-                this.state = 'missingResources';
-                this.description = this.$t('MissingResources')
+                this.state = "missingResources";
+                this.description = this.$t("MissingResources");
             } else {
-                this.state = 'launching';
-                this.description = this.$t('Launching')
+                this.state = "launching";
+                this.description = this.$t("Launching");
                 try {
                     await launch(this.versionDetail);
-                } catch(err) {
-                    console.log(err)
+                } catch (err) {
+                    console.log(err);
                 }
-                this.visible = false
+                this.visible = false;
             }
-            this.$store.dispatch('refreshConfig')
+            this.$store.dispatch("refreshConfig");
         },
         async downloadDependenceAndStart() {
             this.progress = 0;
-            this.startTimer()
+            this.startTimer();
             this.missionID = await scheduleDownloadTasks({
                 store: this.$store,
                 name: this.version.name,
                 tasks: this.missingResources,
                 callback: async () => {
                     this.progress = 100;
-                    this.state = 'launching';
-                    this.description = this.$t('Launching')
+                    this.state = "launching";
+                    this.description = this.$t("Launching");
                     try {
                         await launch(this.versionDetail);
                     } catch (err) {
-                        console.log(err)
+                        console.log(err);
                     }
-                    this.visible = false
+                    this.visible = false;
                 }
             });
-            console.log('change to download')
-            this.state = 'downloading';
-            this.description = this.$t('Downloading')
+            console.log("change to download");
+            this.state = "downloading";
+            this.description = this.$t("Downloading");
         }
     }
 };

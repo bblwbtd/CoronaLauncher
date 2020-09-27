@@ -1,7 +1,11 @@
 'use strict'
 
+import os from 'os'
+import fs from 'fs'
 import { app, protocol, BrowserWindow, globalShortcut } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
+import { getCacheDir } from './scripts/config'
+import { ensureDirExist } from './scripts/utils'
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -30,7 +34,8 @@ function createWindow() {
       nodeIntegrationInWorker: true,
       enableRemoteModule: true
     },
-    frame: false
+    frame: os.platform() === 'darwin',
+    titleBarStyle: 'hidden'
   })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -110,3 +115,10 @@ if (isDevelopment) {
     })
   }
 }
+
+app.setName('Corona Launcher')
+
+fs.unlinkSync(app.getPath('userData'))
+const cacheDir = getCacheDir()
+ensureDirExist(cacheDir)
+app.setPath('userData', cacheDir)
