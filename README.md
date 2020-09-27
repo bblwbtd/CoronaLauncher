@@ -1,10 +1,10 @@
-# <center> Corona Launcher </center>
+<h1 align="center"> Corona Launcher </h1>
 
 <div align="center">
     <img src="./build/icons/128x128.png"/>
 </div>
 
-## <center> Make Minecraft Easier </center>
+<h2 align="center"> Make Minecraft Easier </h2>
 
 ### Installations
 - [Github Release]()
