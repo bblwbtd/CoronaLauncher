@@ -41,6 +41,11 @@ jobs:
 
     - name: Build Electron Application
       run: npm run electron:build
+
+    - name: Get Version from GitHub reftags
+      if: github.event_name == 'release'
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 # ============= Windows
     - name: Package Name (Windows)
       if: matrix.platform == 'windows-latest'
@@ -60,7 +65,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ steps.pkgname-windows.outputs.filename }}
-        asset_name: CoronaLauncher-${{ github.ref }}.exe
+        asset_name: CoronaLauncher-${{ steps.get_version.outputs.VERSION }}.exe
         tag: ${{ github.ref }}
         overwrite: true
 
@@ -83,7 +88,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ steps.pkgname-macos.outputs.filename }}
-        asset_name: CoronaLauncher-${{ github.ref }}.dmg
+        asset_name: CoronaLauncher-${{ steps.get_version.outputs.VERSION }}.dmg
         tag: ${{ github.ref }}
         overwrite: true
  
@@ -106,7 +111,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ steps.pkgname-linux.outputs.filename }}
-        asset_name: CoronaLauncher-${{ github.ref }}.AppImage
+        asset_name: CoronaLauncher-${{ steps.get_version.outputs.VERSION }}.AppImage
         tag: ${{ github.ref }}
         overwrite: true
  
