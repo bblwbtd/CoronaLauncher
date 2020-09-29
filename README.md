@@ -8,6 +8,7 @@
 
 ### Installations
 - [Github Release]()
+- [For China Local area network users]()
 
 ### Features
 - Compatible with Mac, Linux and Windows10.
