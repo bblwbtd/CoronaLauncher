@@ -39,7 +39,7 @@ function createWindow() {
   })
 
   const ses = win.webContents.session
-  ses.setSpellCheckerDictionaryDownloadURL('')
+  ses.setSpellCheckerDictionaryDownloadURL('https://www.fuck.com')
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -124,9 +124,9 @@ app.setName('Corona Launcher')
 if (fs.existsSync(app.getPath('userData'))) {
   try {
     fs.unlinkSync(app.getPath('userData'))
-  } catch (e) {
-    console.log(e)
-  }
+  } catch (e) { 
+    // empty
+   }
 }
 
 const cacheDir = getCacheDir()
