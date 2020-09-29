@@ -30,7 +30,7 @@ jobs:
           ${{ runner.os }}-node-
     - run: npm install
     - run: npm run electron:build
-    - run: echo ::set-output name=filename::$(dir dist_electron/*.exe)
+    - run: echo "::set-output name=filename::$(dir dist_electron/*.exe)"
       name: Determinate package name
       id: pkgname
     - uses: actions/upload-artifact@master
