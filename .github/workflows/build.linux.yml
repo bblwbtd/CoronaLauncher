@@ -77,7 +77,7 @@ jobs:
         name: CoronaLauncher-${{ github.sha }}.macos.dmg
         path: ${{ steps.pkgname-macos.outputs.filename }}
 
-    - name: Upload Release (Windows)
+    - name: Upload Release (macOS)
       if: github.event_name == 'release' && matrix.platform == 'macos-latest'
       uses: svenstaro/upload-release-action@v1-release
       with:
