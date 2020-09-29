@@ -66,7 +66,7 @@ function registerKeys() {
   })
 }
 
-app.on('browser-window-created',function(e,window) {
+app.on('browser-window-created', function (e, window) {
   window.setMenuBarVisibility(false);
 });
 
@@ -121,7 +121,14 @@ if (isDevelopment) {
 
 app.setName('Corona Launcher')
 
-fs.unlinkSync(app.getPath('userData'))
+if (fs.existsSync(app.getPath('userData'))) {
+  try {
+    fs.unlinkSync(app.getPath('userData'))
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const cacheDir = getCacheDir()
 ensureDirExist(cacheDir)
 app.setPath('userData', cacheDir)
