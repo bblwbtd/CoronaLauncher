@@ -7,13 +7,13 @@
 <h2 align="center"> Make Minecraft Easier </h2>
 
 ### Installations
-- [Github Release]()
+- [Github Release](https://github.com/bblwbtd/CoronaLauncher/releases)
 - [For China Local area network users]()
 
 ### Features
 - Compatible with Mac, Linux and Windows10.
 - No JavaFx requirement.
-
+`
 ### Compilation
 - Make sure you clone this project and have node installed.
 - Run `npm install` or `yarn install` in the project directory.
