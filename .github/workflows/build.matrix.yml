@@ -1,0 +1,117 @@
+name: CoronaLauncher Build Matrix
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  release:
+    types: [ prereleased ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+# ============= Dependency
+    - name: Checkout Source Code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
+    - name: Read NPM Cache Directory
+      id: npm-cache
+      run: |
+        echo "::set-output name=dir::$(npm config get cache)"
+
+    - uses: actions/cache@v2
+      with:
+        path: ${{ steps.npm-cache.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+# ============= Build
+    - name: Configure node_modules
+      run: npm install
+
+    - name: Build Electron Application
+      run: npm run electron:build
+
+    - name: Get Version from GitHub reftags
+      if: github.event_name == 'release'
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+# ============= Windows
+    - name: Package Name (Windows)
+      if: matrix.platform == 'windows-latest'
+      run: echo "::set-output name=filename::$(ls dist_electron/*.exe)"
+      id: pkgname-windows
+
+    - name: Upload Artifact (Windows)
+      if: matrix.platform == 'windows-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: CoronaLauncher-${{ github.sha }}.windows.exe
+        path: ${{ steps.pkgname-windows.outputs.filename }}
+
+    - name: Upload Release (Windows)
+      if: github.event_name == 'release' && matrix.platform == 'windows-latest'
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ steps.pkgname-windows.outputs.filename }}
+        asset_name: CoronaLauncher-${{ steps.get_version.outputs.VERSION }}.exe
+        tag: ${{ github.ref }}
+        overwrite: true
+
+# ============= macOS
+    - name: Package Name (macOS)
+      if: matrix.platform == 'macos-latest'
+      run: echo "::set-output name=filename::$(ls dist_electron/*.dmg)"
+      id: pkgname-macos
+
+    - name: Upload Artifact (macOS)
+      if: matrix.platform == 'macos-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: CoronaLauncher-${{ github.sha }}.macos.dmg
+        path: ${{ steps.pkgname-macos.outputs.filename }}
+
+    - name: Upload Release (macOS)
+      if: github.event_name == 'release' && matrix.platform == 'macos-latest'
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ steps.pkgname-macos.outputs.filename }}
+        asset_name: CoronaLauncher-${{ steps.get_version.outputs.VERSION }}.dmg
+        tag: ${{ github.ref }}
+        overwrite: true
+ 
+ # ============= Linux
+    - name: Package Name (Linux)
+      if: matrix.platform == 'ubuntu-latest'
+      run: echo "::set-output name=filename::$(ls dist_electron/*.AppImage)"
+      id: pkgname-linux
+
+    - name: Upload Artifact (Linux)
+      if: matrix.platform == 'ubuntu-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: CoronaLauncher-${{ github.sha }}.linux.AppImage
+        path: ${{ steps.pkgname-linux.outputs.filename }}
+
+    - name: Upload Release (Linux)
+      if: github.event_name == 'release' && matrix.platform == 'ubuntu-latest'
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ steps.pkgname-linux.outputs.filename }}
+        asset_name: CoronaLauncher-${{ steps.get_version.outputs.VERSION }}.AppImage
+        tag: ${{ github.ref }}
+        overwrite: true
+ 
