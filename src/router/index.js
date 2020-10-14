@@ -6,6 +6,7 @@ import Config from '../views/Config.vue'
 import Login from '../views/Login'
 import VersionConfig from '../views/VersionConfig'
 import Download from '../views/Download'
+import Servers from '../views/Servers'
 
 Vue.use(VueRouter)
   const routes = [
@@ -45,6 +46,11 @@ Vue.use(VueRouter)
     path: '/download',
     name: 'Download',
     component: Download
+  },
+  {
+    path: '/servers',
+    name: 'Servers',
+    component: Servers
   }
 ]
 

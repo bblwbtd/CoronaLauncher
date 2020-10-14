@@ -75,6 +75,15 @@ const defaultConfig = {
             }
         }
     ],
+    servers: [
+        {
+            id: '233',
+            title: 'CoronaServer',
+            host: 'ldgame.fun',
+            port: 25565,
+            version: '1.16.3'
+        }
+    ],
     currentAccount: {
         id: '2333',
         username: 'Steve',

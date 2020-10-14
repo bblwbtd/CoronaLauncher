@@ -4,8 +4,9 @@ import os from 'os'
 import fs from 'fs'
 import { app, protocol, BrowserWindow, globalShortcut } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { getCacheDir } from './scripts/config'
+import { getCacheDir, getConfig, applyAndWriteConfig } from './scripts/config'
 import { ensureDirExist } from './scripts/utils'
+import { decodeLink } from './scripts/protocol'
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -132,3 +133,22 @@ if (fs.existsSync(app.getPath('userData'))) {
 const cacheDir = getCacheDir()
 ensureDirExist(cacheDir)
 app.setPath('userData', cacheDir)
+
+if (app.isDefaultProtocolClient('minecraft')) {
+  app.setAsDefaultProtocolClient('minecraft')
+}
+
+app.on('open-url', function(event, url) {
+  event.preventDefault()
+  console.log(url)
+  const server = decodeLink(url)
+  if (server) {
+    const config = getConfig()
+    config.servers.push(server)
+    applyAndWriteConfig(config)
+  }
+ 
+  if (!win) {
+    createWindow()
+  }
+})

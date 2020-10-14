@@ -7,7 +7,6 @@
         </v-app-bar>
         <v-row class="justify-center">
             <v-col cols="12" md="8" lg="6">
-                {{$t('Installed')}}
                 <VersionList class="mt-3" />
             </v-col>
         </v-row>

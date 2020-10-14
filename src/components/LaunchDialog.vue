@@ -84,7 +84,9 @@ export default {
         progress: 0,
         timerID: undefined,
         versionDetail: undefined,
-        description: ""
+        description: "",
+        host: "",
+        port: 0
     }),
     watch: {
         visible: function(value) {
@@ -134,8 +136,10 @@ export default {
         stopTimer() {
             clearInterval(this.timerID);
         },
-        async launch(version) {
+        async launch(version, host, port) {
             this.version = version;
+            this.host = host
+            this.port = port
             this.visible = true;
             const mission = this.$store.state.missions.find(
                 m => m.name === version.name && m.state === "Downloading"
@@ -175,7 +179,7 @@ export default {
                 this.state = "launching";
                 this.description = this.$t("Launching");
                 try {
-                    await launch(this.versionDetail);
+                    await launch(this.versionDetail, host, port);
                 } catch (err) {
                     console.log(err);
                 }
@@ -195,7 +199,7 @@ export default {
                     this.state = "launching";
                     this.description = this.$t("Launching");
                     try {
-                        await launch(this.versionDetail);
+                        await launch(this.versionDetail, this.host, this.port);
                     } catch (err) {
                         console.log(err);
                     }

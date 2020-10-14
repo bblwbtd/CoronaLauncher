@@ -1,15 +1,12 @@
 <template>
     <v-list
         v-if="
-            $store.state.versions.filter(version => version.name != 'Latest')
-                .length > 0
+            $store.state.versions.length > 0
         "
     >
         <v-list-item
             :key="version.name"
-            v-for="version in $store.state.versions.filter(
-                version => version.name != 'Latest'
-            )"
+            v-for="version in $store.state.versions"
         >
             <v-list-item-content>{{ version.name }}</v-list-item-content>
             <v-list-item-action>

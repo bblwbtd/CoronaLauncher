@@ -69,5 +69,21 @@
   "width": "Width",
   "AdvancedConfig": "AdvancedConfig",
   "JVMArgument": "JVM argument",
-  "CoronaLauncher": "Corona Launcher"
+  "CoronaLauncher": "Corona Launcher",
+  "Server": "Server",
+  "Latency": "Latency",
+  "Player": "Player",
+  "Version": "Version",
+  "ServerName": "ServerName",
+  "NewServer": "New Server",
+  "InvalidPort": "Invalid port",
+  "NameIsTooLong": "The name is too long",
+  "NameIsTooShort": "The name is too short",
+  "NewServerManually": "Set server config manually",
+  "ImportFromLink": "Import from link",
+  "ImportFromQR": "Import from QR code",
+  "EditServer": "EditServer",
+  "PleaseInputLink": "Please Input link",
+  "InvalidaLink": "Invalid link",
+  "DuplicatedName": "Duplicated name"
 }

@@ -1,34 +1,11 @@
 <template>
     <v-form ref="form">
-        <v-select
+        <VersionSelect 
             @change="fillVersionName"
             v-model="formData.version"
-            :label="$t('Versions')"
-            :items="finalVersions"
             :disabled="!canEditVersion"
-        >
-            <template v-slot:prepend-item>
-                <v-list-item>
-                    <v-checkbox
-                        v-model="showRelease"
-                        class="mr-3"
-                        :label="$t('Release')"
-                    />
-                    <v-checkbox
-                        v-model="showSnapShot"
-                        class="mr-3"
-                        :label="$t('Snapshot')"
-                    />
-                    <v-text-field
-                        v-model="search"
-                        :placeholder="$t('Search')"
-                    />
-                </v-list-item>
-            </template>
-            <template v-slot:no-data>
-                <v-list-item>{{ $t("NoData") }}</v-list-item>
-            </template>
-        </v-select>
+            :versions="versions"
+        />
         <v-text-field
             v-model="formData.name"
             :rules="versionNameRule()"
@@ -52,9 +29,15 @@
 </template>
 
 <script>
-
+import VersionSelect from './VersionSelect'
 
 export default {
+    components: {
+        VersionSelect
+    },
+    mounted() {
+        console.log(this.versions)
+    },
     props: {
         formData: {
             type: Object,
@@ -80,18 +63,6 @@ export default {
         canEditVersion: {
             type: Boolean,
             default: true
-        }
-    },
-    computed: {
-        finalVersions: function() {
-            return this.versions.filter(version => {
-
-                if (!this.showRelease && version.type === 'release') return false
-
-                if (!this.showSnapShot && version.type === 'snapshot') return false
-
-                return version.id.includes(this.search)
-            }).map(v => ({ text: `${v.type} ${v.id}`, value: v.id }))
         }
     },
     watch: {

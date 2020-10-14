@@ -5,7 +5,7 @@ const { getConfig, applyAndWriteConfig, getDefaultVersionConfig } = require("./c
 const os = require("os");
 const { exec } = require("child_process");
 
-function launch(versionDetail) {
+function launch(versionDetail, host, port) {
     return new Promise((resolve, reject) => {
         const config = getConfig();
         config.lastLaunch = versionDetail.id
@@ -30,8 +30,9 @@ function launch(versionDetail) {
                 memory,
                 "CoronaLauncher",
                 "0.0.1",
-                "",
-                jvmArgs
+                host,
+                port,
+                jvmArgs,
             );
     
             console.log(command);
@@ -66,7 +67,8 @@ function buildCommand(
     maxMemory,
     launcherName,
     launcherVersion,
-    isDemo,
+    host,
+    port,
     extraArgs = ''
 ) {
     const { assetIndex, id } = versionDetail;
@@ -103,8 +105,8 @@ function buildCommand(
         command = command.replace(key, value);
     });
 
-    if (isDemo) {
-        command = command + " --demo";
+    if (host && port) {
+        command = `${command} --server ${host} --port ${port}`
     }
     return command;
 }

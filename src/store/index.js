@@ -22,7 +22,7 @@ export default new Vuex.Store({
       state.accountState = accountState
     },
     setConfig(state, config) {
-      state.config = config,
+      state.config = { ...config },
       applyAndWriteConfig(config)
     },
     setVersions(state, versions) {

@@ -288,5 +288,5 @@ module.exports = {
     download,
     getMirror,
     replaceHost,
-    scheduleDownloadTasks
+    scheduleDownloadTasks,
 };

@@ -8,7 +8,17 @@ module.exports = {
                 appId: 'fun.ldgame.CoronaLauncher',
                 productName: "CoronaLauncher",
                 copyright: "Copyright © 2020 Neboer",
-                mac: {},
+                mac: {
+                    extendInfo: {
+                        CFBundleURLTypes: [
+                            {
+                                CFBundleTypeRole: 'Viewer',
+                                CFBundleURLName: 'minecraft',
+                                CFBundleURLSchemes: ['minecraft']
+                            }
+                        ]
+                    }
+                },
                 dmg: {
                     window: {
                         width: 800,

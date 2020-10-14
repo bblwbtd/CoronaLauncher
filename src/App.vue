@@ -15,7 +15,6 @@ import { getConfig } from "./scripts/config";
 import { checkAccount } from "./scripts/login";
 import { updateVersionManifest } from "./scripts/downloader/version";
 
-
 export default {
     name: "Home",
     components: {

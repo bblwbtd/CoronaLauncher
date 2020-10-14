@@ -68,5 +68,21 @@
   "height": "屏幕高度",
   "AdvancedConfig": "高级设置",
   "JVMArgument": "JVM 参数",
-  "CoronaLauncher": "日冕启动器"
+  "CoronaLauncher": "日冕启动器",
+  "Server": "服务器",
+  "Latency": "延迟",
+  "Player": "玩家",
+  "Version": "版本",
+  "ServerName": "服务器名称",
+  "NewServer": "添加服务器",
+  "InvalidPort": "无效的端口",
+  "NameIsTooLong": "名称过长",
+  "NameIsTooShort": "名称过短",
+  "NewServerManually": "手动输入",
+  "ImportFromLink": "从链接导入",
+  "ImportFromQR": "从二维码导入",
+  "EditServer": "编辑服务器",
+  "PleaseInputLink": "请输入链接",
+  "InvalidaLink": "无效的链接",
+  "DuplicatedName": "重复的名字"
 }
