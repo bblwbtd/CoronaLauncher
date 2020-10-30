@@ -16,24 +16,24 @@
                 {{ `${$t("Latency")}:${latency}ms` }}</v-list-item-subtitle
             >
         </v-list-item-content>
-        <v-list-item-action>
+        <v-list-item-action >
             <div>
-                <v-btn icon color="red">
+                <v-btn icon color="red" v-if="!readOnly">
                     <v-icon @click="() => onDelete(server.id)">
                         mdi-delete
                     </v-icon>
                 </v-btn>
-                <v-btn icon @click="refresh" :disabled="refreshing">
+                <v-btn icon @click="refresh" :disabled="refreshing" >
                     <v-icon>
                         mdi-refresh
                     </v-icon>
                 </v-btn>
-                <v-btn icon @click="() => onEdit(server.id)">
+                <v-btn icon @click="() => onEdit(server.id)" v-if="!readOnly">
                     <v-icon>
                         mdi-tune
                     </v-icon>
                 </v-btn>
-                <v-btn icon @click="() => onLaunch(server)">
+                <v-btn icon @click="() => onLaunch(server)" v-if="!readOnly">
                     <v-icon>
                         mdi-play
                     </v-icon>
@@ -52,6 +52,7 @@ export default {
         onLaunch: Function,
         onDelete: Function,
         onEdit: Function,
+        readOnly: Boolean
     },
     mounted() {
         this.refresh()

@@ -4,9 +4,8 @@ import os from 'os'
 import fs from 'fs'
 import { app, protocol, BrowserWindow, globalShortcut } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import { getCacheDir, getConfig, applyAndWriteConfig } from './scripts/config'
+import { getCacheDir } from './scripts/config'
 import { ensureDirExist } from './scripts/utils'
-import { decodeLink } from './scripts/protocol'
 // import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -14,6 +13,8 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+
+let serverLink
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -58,6 +59,8 @@ function createWindow() {
 
   win.webContents.once('did-finish-load', () => {
     win.setMenuBarVisibility(false);
+    win.webContents.send('server', serverLink)
+    serverLink = undefined
   })
 }
 
@@ -65,6 +68,10 @@ function registerKeys() {
   globalShortcut.register('f12', () => {
     win.webContents.openDevTools()
   })
+
+  // globalShortcut.register('CommandOrControl+f12', () => {
+  //   win.webContents.send('server', 'minecraft://4egxuAJdFN51MK7WRm85HzJyo9HRMoERHp9tR7W8KHQqey9z6sauK4MNPdPHtpqcdf8jkYCLnRswBtbVRjaFPjBwT684')
+  // })
 }
 
 app.on('browser-window-created', function (e, window) {
@@ -140,15 +147,11 @@ if (app.isDefaultProtocolClient('minecraft')) {
 
 app.on('open-url', function(event, url) {
   event.preventDefault()
-  console.log(url)
-  const server = decodeLink(url)
-  if (server) {
-    const config = getConfig()
-    config.servers.push(server)
-    applyAndWriteConfig(config)
-  }
- 
-  if (!win) {
+  serverLink = url
+  if (win) {
+    win.webContents.send('server', serverLink)
+    serverLink = undefined
+  } else if (app.isReady()) {
     createWindow()
   }
 })

@@ -6,6 +6,17 @@ const { fetchVersionManifest, getLatestRelease, fetchVersionDetail, writeVersion
 
 const versionsDirPath = path.join(getConfig().gameRoot, 'versions')
 
+// Download version detail into versions directory without resources
+async function installNewVersion(id) {
+    const manifest = await fetchVersionManifest()
+    const versionMeta = manifest.versions.find(
+        version => version.id === id
+    );
+    const versionDetail = await fetchVersionDetail(versionMeta.url);
+    await writeVersionDetail(versionDetail);
+    return versionDetail
+}
+
 async function readAllVersions() {
     ensureDirExist(versionsDirPath)
     const files = fs.readdirSync(versionsDirPath)
@@ -74,6 +85,7 @@ function renameVersion(oldName, newName) {
 module.exports = {
     readAllVersions,
     removeVersion,
-    renameVersion
+    renameVersion,
+    installNewVersion
 }
 

@@ -4,14 +4,18 @@
 
 <script>
 export default {
+    props: {
+        filter: {
+            type: Function,
+            default: () => true
+        }
+    },
     data(ins) {
         return {
-            items: ins.$store.state.versions.map(v => v.name)
+            items: ins.$store.state.versions.filter(this.filter).map(v => v.name)
         }
     }
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

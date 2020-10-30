@@ -84,5 +84,8 @@
   "EditServer": "编辑服务器",
   "PleaseInputLink": "请输入链接",
   "InvalidaLink": "无效的链接",
-  "DuplicatedName": "重复的名字"
+  "DuplicatedName": "重复的名字",
+  "JoinServer": "加入服务器",
+  "SaveServer": "保存服务器",
+  "MinecraftVersion": "Minecraft版本"
 }

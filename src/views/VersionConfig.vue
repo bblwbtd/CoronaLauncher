@@ -57,13 +57,11 @@ import VersionConfigForm from "../components/VersionConfigForm";
 import BackButton from "../components/BackButton";
 import AdvancedConfigForm from "../components/AdvancedConfigForm";
 import {
-    fetchVersionDetail,
-    writeVersionDetail,
     fetchVersionManifest
 } from "../scripts/downloader/version";
 import { scheduleDownloadTasks } from "../scripts/common";
 import { validateResources, launch } from "../scripts/launcher";
-import { renameVersion } from "../scripts/versions";
+import { installNewVersion, renameVersion } from "../scripts/versions";
 
 export default {
     components: {
@@ -124,11 +122,8 @@ export default {
                 renameVersion(this.originalFormData.name, formData.name);
                 return;
             }
-            const versionMeta = this.manifest.versions.find(
-                version => version.id === formData.version
-            );
-            const versionDetail = await fetchVersionDetail(versionMeta.url);
-            await writeVersionDetail(versionDetail);
+
+            const versionDetail = await installNewVersion(formData.version)
 
             if (formData.downloadImmediately) {
                 const tasks = await validateResources(

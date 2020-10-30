@@ -134,8 +134,6 @@ export default {
     },
     methods: {
         onLaunch(server) {
-            // console.log(versionName)
-            // console.log(server)
             const version = this.$store.state.versions.find(
                 v => v.name === server.version
             );
@@ -174,7 +172,6 @@ export default {
                 default:
                     return
             }
-
             if (formData.id) {
                 for (let i = 0; i < config.servers.length; i += 1) {
                     const server = config.servers[i];

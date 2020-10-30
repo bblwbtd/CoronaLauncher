@@ -85,5 +85,8 @@
   "EditServer": "EditServer",
   "PleaseInputLink": "Please Input link",
   "InvalidaLink": "Invalid link",
-  "DuplicatedName": "Duplicated name"
+  "DuplicatedName": "Duplicated name",
+  "JoinServer": "Join server",
+  "SaveServer": "Save server",
+  "MinecraftVersion": "Minecraft version"
 }
