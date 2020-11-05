@@ -13,7 +13,7 @@
 ### Features
 - Compatible with Mac, Linux and Windows10.
 - No JavaFx requirement.
-`
+
 ### Compilation
 - Make sure you clone this project and have node installed.
 - Run `npm install` or `yarn install` in the project directory.
