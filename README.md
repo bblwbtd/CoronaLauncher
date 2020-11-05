@@ -13,6 +13,7 @@
 ### Features
 - Compatible with Mac, Linux and Windows10.
 - No JavaFx requirement.
+- Share and join the minecraft server with [link](minecraft://J4vQ5w3cC8YHn9gLEF6qe87Vvtj2VamrsQjXT7MagBfuPeAj7k1xGB7U3aUojmgaVp2i4BFRKx8BoPANXoVWNJfxmTDU5d919MXLA1RtooUrHv1TMFLhZcgNpRZD3zBr5xTBgsxRFLA4QFZG3ifMbErXW6QHRnXshFYY). (You need to have Corona Launcher installed)
 
 ### Compilation
 - Make sure you clone this project and have node installed.

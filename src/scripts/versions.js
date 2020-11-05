@@ -13,7 +13,7 @@ async function installNewVersion(id) {
         version => version.id === id
     );
     const versionDetail = await fetchVersionDetail(versionMeta.url);
-    await writeVersionDetail(versionDetail);
+    writeVersionDetail(versionDetail);
     return versionDetail
 }
 

@@ -1,7 +1,7 @@
 <template>
   <v-list>
     <ServerItem 
-        :key="server.title" 
+        :key="server.id" 
         v-for="server in servers" 
         :server="server"
         :onLaunch="onLaunch"

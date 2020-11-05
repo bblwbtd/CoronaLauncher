@@ -44,7 +44,7 @@
                 </template>
                 <span>{{$t('ImportFromLink')}}</span>
             </v-tooltip>
-            <v-tooltip left>
+            <!-- <v-tooltip left>
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn icon fab class="pink" color="white" small v-on="on" v-bind="attrs">
                         <v-icon>
@@ -53,7 +53,7 @@
                     </v-btn>
                 </template>
                 <span>{{$t('ImportFromQR')}}</span>
-            </v-tooltip>
+            </v-tooltip> -->
         </v-speed-dial>
         <LaunchDialog ref="launchDialog" />
         <CommonDialog

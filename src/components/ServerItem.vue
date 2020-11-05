@@ -23,6 +23,11 @@
                         mdi-delete
                     </v-icon>
                 </v-btn>
+                <v-btn icon>
+                    <v-icon size="20" @click="copyServer">
+                        mdi-content-copy
+                    </v-icon>
+                </v-btn>
                 <v-btn icon @click="refresh" :disabled="refreshing" >
                     <v-icon>
                         mdi-refresh
@@ -44,8 +49,10 @@
 </template>
 
 <script>
+import { clipboard } from 'electron';
 import { pingServerLatency, pingServerList } from "../scripts/ping";
-
+import { encodeServerInfo } from '../scripts/protocol'
+ 
 export default {
     props: {
         server: Object,
@@ -92,6 +99,9 @@ export default {
             const response = await pingServerList(this.server.host, this.server.port);
             console.log(response);
             this.detail = { ...this.detail, ...response };
+        },
+        copyServer() {
+            clipboard.writeText(encodeServerInfo(this.server))
         }
     }
 };
