@@ -41,6 +41,8 @@ jobs:
 
     - name: Build Electron Application
       run: npm run electron:build
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get Version from GitHub reftags
       if: github.event_name == 'release'
